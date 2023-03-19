@@ -1,13 +1,17 @@
+import Main.userInput
+
 import scala.io.StdIn.*
 
 object Main extends App {
-    //Should work with this input = name,202003031600,202003031700, hopefully this works :D
+    //Should work with this input = name,202003031700,202003031800, hopefully this works :D
 
   println("Choose to add an event, edit event or delete an event")
   var userInput = readLine()
   if userInput.toLowerCase == "add" then
     println("Write the event name, date, starTime, endTime and description. Seperate these by comma ','")
     userInput = readLine()
+    Events(userInput).addEvent
+
 
   if userInput.toLowerCase == "edit" then
     println("Which event do you wish to edit\nList of recorded events: " + Events(userInput).readFile.keys)
@@ -16,6 +20,25 @@ object Main extends App {
   if userInput.toLowerCase == "delete" then
     println("Which event do you wish to delete\nList of recorded events: " + Events(userInput).readFile.keys)
     userInput = readLine()
+    Events(userInput).deleteEvent
+    println(Events(userInput).readFile)}
+  val testEvent = Events("name,202003031700,202003031800, hopefully this works :D")
+@main
+  def testWriting =
+    testEvent.writetoFile(testEvent.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "202003031700z", "202003031800z",  "hopefully this works :D")))
+@main
+  def testReading = println(testEvent.readFile)
+
+@main
+  def testAdding = testEvent.addEvent // start time should be unique
+
+@main
+  def testIcalendar =
+    println(testEvent.iCalendarFormat(testEvent.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
+
+@main
+  def testDelete =
+    Events("202003031800").deleteEvent
 
 
 
@@ -24,7 +47,3 @@ object Main extends App {
 
 
 
-
-
-
-}
