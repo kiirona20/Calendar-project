@@ -1,0 +1,14 @@
+6.3
+Nothing has been done during these 2 weeks.
+
+
+20.3
+Events Class has been added. Implemented data structure. Add, delete and edit functions implemented.
+Implemented a way to read and write Calendar data to the eventInfo file.
+
+I found hard to find a way to append, delete and edit data from a file. Specifically
+preserving the already exisinting data and only modifying the data that is needed to modify.
+
+Workload was about 15 hours.
+
+The project is approx 2 weeks behind from schedule.

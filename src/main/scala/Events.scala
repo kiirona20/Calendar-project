@@ -102,26 +102,44 @@ class Events(userInput: String) {
     // Generates new UID
     val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
     val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
-
     val formattedUserInput = iCalendarFormat(userInputToSeq)
-    val readFileValues = readFile.map((i)=>i._2).reduce(_++_)
-    writetoFile(iCalendarFormat(readFileValues) ++ formattedUserInput)
+    if readFile.size > 1 then
+      val readFileValues = readFile.map((i)=>i._2).reduce(_++_)
+      writetoFile(iCalendarFormat(readFileValues) ++ formattedUserInput)
+    else if readFile.size == 1 then
+      writetoFile(iCalendarFormat(readFile.values.toSeq(0))++formattedUserInput)
+    else
+      writetoFile(formattedUserInput)
 
 
-
+  def showEventDetails = readFile(userInput)
 
 // Tarkoitus: Etsi rivi tiedostosta ja muokkaa sitä. Esim käyttäjä syöttää tapahtuman nimen ja mitä hän haluaa muokata. editEvent etsii rivin tiedostosta ja kirjoittaa tämän rivin uudestaan.
-  def editEvent = ???
+  def editEvent(eventName: String, whatToEdit: (String, String)): Unit =
+    var listOfEvents = readFile
+
+    val index = readFile(userInput).indexOf(whatToEdit._1)
+    val updatedList = readFile(userInput).updated(index,whatToEdit._2)
+    println(userInput)
+    println(updatedList)
+
+    listOfEvents = readFile + ("202003031700" -> updatedList)
+    println(listOfEvents.values.reduce(_++_))
+    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_)))
+
+
+
 // Tarkoitus : Talenna jokainen rivi muuttujaan, jos rivit eivät sisällä event to deletee, niin kirjoita nämä rivit uudestaan tiedostoon.
 
-// implement method when maptowrite size is 0
+// implement method when maptowrite size is
   def deleteEvent =
-    val mapToWrite = readFile.-(userInput).map((i)=>i._2).reduce(_++_)
+    var mapToWrite = Seq[String]()
     println(mapToWrite)
-    if mapToWrite.size > 0 then
+    if readFile.size > 1 then
+      mapToWrite = readFile.-(userInput).values.reduce(_++_)
       writetoFile(iCalendarFormat(mapToWrite))
     else
-      "Nothing to delete"
+     writetoFile(Map(""->mapToWrite))
 
 
 
