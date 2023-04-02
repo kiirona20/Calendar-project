@@ -41,8 +41,8 @@ class Events(userInput: String) {
     // Checks if the linestoEdit is not empty
 
     if linestoedit.size > 0 then
-
-      for i <- 0until(linestoedit.length/4) do
+      var i = 0
+      while i < linestoedit.length do
         empty = empty ++ (Map[String,Seq[String]](linestoedit(i+2)-> Seq[String](
         "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\nBEGIN:VEVENT\n",
         "UID:" + linestoedit(i)+"\n",
@@ -51,6 +51,7 @@ class Events(userInput: String) {
         "DTEND:" + linestoedit(i+3) + "z\n",
         "SUMMARY:" + linestoedit(i+4) + "\n",
         "END:VEVENT\n\nEND:VCALENDAR\n\n")))
+        i += 5
       empty
     else
       empty
@@ -115,11 +116,18 @@ class Events(userInput: String) {
   def showEventDetails = readFile(userInput)
 
 // Tarkoitus: Etsi rivi tiedostosta ja muokkaa sitä. Esim käyttäjä syöttää tapahtuman nimen ja mitä hän haluaa muokata. editEvent etsii rivin tiedostosta ja kirjoittaa tämän rivin uudestaan.
-  def editEvent(eventName: String, whatToEdit: (String, String)): Unit =
+
+
+
+  def editEvent(whatToEdit: (String, String)): Unit =
     var listOfEvents = readFile
 
-    val index = readFile(userInput).indexOf(whatToEdit._1)
-    val updatedList = readFile(userInput).updated(index,whatToEdit._2)
+    var index = listOfEvents(userInput).indexOf(whatToEdit._1)
+
+    if index == -1 then
+      index = listOfEvents(userInput).length-1
+
+    val updatedList = listOfEvents(userInput).updated(index,whatToEdit._2)
     println(userInput)
     println(updatedList)
 

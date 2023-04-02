@@ -34,7 +34,7 @@ object Main extends App {
 
 
 
-  val testEvent = Events("name,202003031700,202003032000, hopefully this works :D")
+  val testEvent = Events("name,202003031900,202003032000, hopefully this works :D")
 
 
 
@@ -53,10 +53,11 @@ object Main extends App {
 
 @main
   def testDelete =
-    Events("202003031800").deleteEvent
+    Events("202003031900").deleteEvent
 @main
   def testEdit =
-    Events("202003031700").editEvent("202003031700", "222222222222")
+    val test : (String, String) = ("202003031700","jotain")
+    Events("202003031700").editEvent("hopefully this works :D","jotain")
 
 
 
