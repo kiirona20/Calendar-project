@@ -12,3 +12,13 @@ preserving the already exisinting data and only modifying the data that is neede
 Workload was about 15 hours.
 
 The project is approx 2 weeks behind from schedule.
+
+3.4
+Fixed editEvent function. Starting to work on the interface. The project has not been progressing
+as intended because I have not been prioritizing this project over other school work. 
+
+I find it hard to start working on the interface since it requires a lot of background research.
+
+Workload was about 1 hour
+
+The project is approx 4 weeks behind from schedule. 
