@@ -144,7 +144,6 @@ object Events {
 // implement method when maptowrite size is
   def deleteEvent(userInput: String) =
     var mapToWrite = Seq[String]()
-    println(mapToWrite)
     if readFile.size > 1 then
       mapToWrite = readFile.-(userInput).values.reduce(_++_)
       writetoFile(iCalendarFormat(mapToWrite))
@@ -154,7 +153,7 @@ object Events {
 
 
 
-
+  def showEvents = readFile.keys
 
 
 
