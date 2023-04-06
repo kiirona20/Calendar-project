@@ -1,3 +1,5 @@
+
+
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter}
 import java.util.UUID
 import scala.:+
@@ -8,7 +10,7 @@ import scala.compiletime.ops.int
 import sys.process.*
 
 
-class Events(userInput: String) {
+object Events {
 
   // Writes user inputs to a txt file in a correct format.
 
@@ -99,7 +101,7 @@ class Events(userInput: String) {
   //Ongelma : Ei toimi jos yrittää addaa eventin tyhjää txt fileen
   //
 
-  def addEvent =
+  def addEvent(userInput: String) =
     // Generates new UID
     val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
     val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
@@ -113,13 +115,13 @@ class Events(userInput: String) {
       writetoFile(formattedUserInput)
 
 
-  def showEventDetails = readFile(userInput)
+  def showEventDetails(userInput: String) = readFile(userInput)
 
 // Tarkoitus: Etsi rivi tiedostosta ja muokkaa sitä. Esim käyttäjä syöttää tapahtuman nimen ja mitä hän haluaa muokata. editEvent etsii rivin tiedostosta ja kirjoittaa tämän rivin uudestaan.
 
 
 
-  def editEvent(whatToEdit: (String, String)): Unit =
+  def editEvent(userInput:String ,whatToEdit: (String, String)): Unit =
     var listOfEvents = readFile
 
     var index = listOfEvents(userInput).indexOf(whatToEdit._1)
@@ -140,7 +142,7 @@ class Events(userInput: String) {
 // Tarkoitus : Talenna jokainen rivi muuttujaan, jos rivit eivät sisällä event to deletee, niin kirjoita nämä rivit uudestaan tiedostoon.
 
 // implement method when maptowrite size is
-  def deleteEvent =
+  def deleteEvent(userInput: String) =
     var mapToWrite = Seq[String]()
     println(mapToWrite)
     if readFile.size > 1 then
