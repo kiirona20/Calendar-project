@@ -57,6 +57,20 @@ object Main extends App {
 @main
   def testEdit =
     Events.editEvent("202003031700",("hopefully this works :D","jotain"))
+@main
+  def testdateformat =
+    println(Events.getdayOfWeek("202303031700"))
+
+@main
+  def testtimeformat =
+    println(Events.getTime("202303031700"))
+@main
+  def testgetInfo =
+    println(Events.getEventName("202001021700"))
+    println(Events.getEventDescription("202001021700"))
+    println(Events.getEventEndTime("202001021700"))
+
+
 
 
 

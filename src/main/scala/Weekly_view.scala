@@ -8,16 +8,25 @@ import scalafx.scene.control.*
 import scalafx.scene.layout.GridPane
 import scalafx.event.ActionEvent
 import scalafx.scene.layout.GridPane.getHgrow
+import scalafx.scene.input.*
+import java.util.Date.*
 
 import java.awt.Insets
-import scala.collection.immutable.BitSet.empty.until
 
 
 object Weekly_view extends JFXApp3:
 
+
+
+
+
+
+
   def start(): Unit =
 
     val days = List[String]("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+
+
    /*
     Creation of a new primary stage (Application window).
     We can use Scala's anonymous subclass syntax to get quite
@@ -46,32 +55,45 @@ object Weekly_view extends JFXApp3:
           column.percentWidth = columnWidthPercentage
           gridpane.getColumnConstraints().add(column)
         //Time label set to column 0 and to row 1
-        val time = new Label("Time")
-        gridpane.add(time,0,0)
+        //val time = new Label("Time")
+        var date = new Label("Date: 2.1.2023")
+        gridpane.add(date,0,0)
         //Days labels set to columns 1-7 and to row 1.
         for i <- 0until(days.length) do
           val label = new Label(days(i))
           gridpane.add(label,i+1,0)
 
         var clock = 0.00
-        //Time slots will be set to 30 mins. So rowsHeightPercetage will be 100 / (24/0.5)
-        val rowsHeightPercentage = 100 / 48
+        //Time slots will be set to 60 mins. So rowsHeightPercetage will be 100 / (24)
+        val rowsHeightPercentage = 100 / 24
 
-        for i <- 0 until(48) do
+        for i <- 0 until(24) do
           val row = new RowConstraints()
           row.percentHeight = rowsHeightPercentage
           gridpane.getRowConstraints.add(row)
           val label = new Label(clock.toString)
           gridpane.add(label,0,i+1)
-          clock += 0.5
-
-
-
-
-
+          clock += 1
+        //Sets all events to the grid
+        Events.showEvents.foreach(setEventstoGrid(_))
 
         root = gridpane
 
+
+
+        val contextmenu = new ContextMenu(new MenuItem("Add"), new MenuItem("Edit"), new MenuItem("Delete"))
+
+        // On right click creates a contextMenu anywhere
+        onMouseClicked = (me: MouseEvent) => {
+          if me.button == MouseButton.Secondary then
+            contextmenu.show(this.window(),me.screenX,me.screenY)          }
+
+        //Helper function for setting things to the grid
+        def setEventstoGrid(date: String) =
+          val x = Events.getdayOfWeek(date)
+          val y = Events.getTime(date)
+          val label = new Label(Events.getEventName(date))
+          gridpane.add(label,x,y+1)
 
 
 
@@ -81,16 +103,8 @@ object Weekly_view extends JFXApp3:
         listView.prefHeight = 200
         listView.prefWidth = 200
 
-        //creates leabal height and width
-        //val label = new Label("Monday")
-        //label.layoutY = 0
-        //label.layoutX = 0
-        //label.prefWidth = 200
-        //label.prefHeight = 400
 
-
-
-        val contextMenu = new ContextMenu(new MenuItem("add"), new MenuItem("edit"), new MenuItem("delete"))
+        //val contextMenu = new ContextMenu(new MenuItem("add"), new MenuItem("edit"), new MenuItem("delete"))
         //label.contextMenu = contextMenu
         //content shows everything that is on the screen
         //content = List(label)

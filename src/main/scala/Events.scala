@@ -1,6 +1,7 @@
 
 
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter}
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.:+
 import scala.collection.mutable
@@ -8,7 +9,8 @@ import scala.collection.mutable.LinkedHashMap
 import scala.compiletime.ops.int
 //import scala.sys.process.processInternal.File
 import sys.process.*
-
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object Events {
 
@@ -133,7 +135,7 @@ object Events {
     println(userInput)
     println(updatedList)
 
-    listOfEvents = readFile + ("202003031700" -> updatedList)
+    listOfEvents = readFile + (userInput -> updatedList)
     println(listOfEvents.values.reduce(_++_))
     writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_)))
 
@@ -150,10 +152,25 @@ object Events {
     else
      writetoFile(Map(""->mapToWrite))
 
-
+  def getEventName(key: String) =
+    readFile(key)(1)
+  def getEventEndTime(key: String) =
+    readFile(key)(3).dropRight(1)
+  def getEventDescription(key: String) =
+    readFile(key)(4)
 
 
   def showEvents = readFile.keys
+
+  private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmm")
+
+  def getdayOfWeek(date: String) =
+    LocalDateTime.parse(date,dateFormat).getDayOfWeek.getValue
+
+  def getTime(date: String) =
+    LocalDateTime.parse(date,dateFormat).getHour
+    //LocalDateTime.parse(date,dateFormat).getMinute
+
 
 
 
