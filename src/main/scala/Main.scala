@@ -34,7 +34,7 @@ object Main extends App {
 
 
 
-  val testEvent = "name,202003031900,202003032000, hopefully this works :D"
+  val testEvent = "name,202305121500,202003032000, hopefully this works :D"
 
 
 
@@ -59,7 +59,7 @@ object Main extends App {
     Events.editEvent("202003031700",("hopefully this works :D","jotain"))
 @main
   def testdateformat =
-    println(Events.getdayOfWeek("202303031700"))
+    println(Events.getdayOfWeek("202303031700")) // Friday
 
 @main
   def testtimeformat =
