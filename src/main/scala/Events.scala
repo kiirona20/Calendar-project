@@ -154,9 +154,9 @@ object Events {
 
   def getEventName(key: String) =
     readFile(key)(1)
-  
+
   def getEventEndTime(key: String) =
-    readFile(key)(3).dropRight(1)
+    readFile(key)(3)
   def getEventDescription(key: String) =
     readFile(key)(4)
 
@@ -174,11 +174,11 @@ object Events {
 
   def convertDate(date: String) =
     LocalDateTime.parse(date,dateFormat).toLocalDate
-  
+
   def getDateToday = LocalDate.now()
-    
-    
-    
+
+
+
 
 
 

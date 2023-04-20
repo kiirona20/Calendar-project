@@ -66,9 +66,9 @@ object Main extends App {
     println(Events.getTime("202303031700"))
 @main
   def testgetInfo =
-    println(Events.getEventName("202001021700"))
-    println(Events.getEventDescription("202001021700"))
-    println(Events.getEventEndTime("202001021700"))
+    println(Events.getEventName("202305121500"))
+    println(Events.getEventDescription("202305121500"))
+    println(Events.getEventEndTime("202305121500"))
 
 
 
