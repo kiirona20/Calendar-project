@@ -168,9 +168,13 @@ object Events {
   def getdayOfWeek(date: String) =
     LocalDateTime.parse(date,dateFormat).getDayOfWeek.getValue
 
-  def getTime(date: String) =
+  def getHour(date: String) =
+    println(LocalDateTime.parse(date,dateFormat))
     LocalDateTime.parse(date,dateFormat).getHour
-    //LocalDateTime.parse(date,dateFormat).getMinute
+
+
+  def getMin(date: String) = 
+    LocalDateTime.parse(date,dateFormat).getMinute
 
   def convertDate(date: String) =
     LocalDateTime.parse(date,dateFormat).toLocalDate

@@ -63,12 +63,13 @@ object Main extends App {
 
 @main
   def testtimeformat =
-    println(Events.getTime("202303031700"))
+    println(Events.getHour("202303031700"))
 @main
   def testgetInfo =
     println(Events.getEventName("202305121500"))
     println(Events.getEventDescription("202305121500"))
     println(Events.getEventEndTime("202305121500"))
+    println(Events.getMin("202305121540"))
 
 
 
