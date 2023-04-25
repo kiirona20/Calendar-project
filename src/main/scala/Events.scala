@@ -1,7 +1,7 @@
 
 
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter}
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, LocalTime}
 import java.util.UUID
 import scala.:+
 import scala.collection.mutable
@@ -171,7 +171,8 @@ object Events {
   def getHour(date: String) =
     println(LocalDateTime.parse(date,dateFormat))
     LocalDateTime.parse(date,dateFormat).getHour
-
+  def getTime(date: String) =
+    LocalTime.parse(date,dateFormat)
 
   def getMin(date: String) = 
     LocalDateTime.parse(date,dateFormat).getMinute

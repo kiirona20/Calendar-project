@@ -19,6 +19,8 @@ import scalafx.scene.shape.Rectangle
 import java.util.Date.*
 import scalafx.stage.Popup
 
+import java.time.LocalTime
+
 //import java.awt.Insets
 import java.time.temporal.TemporalQueries.localDate
 import scala.annotation.internal.Child
@@ -52,7 +54,7 @@ object Weekly_view extends JFXApp3:
         //for debuggin purposes
         gridpane.gridLinesVisible = true
         //sets gaps between the "days"
-        gridpane.setHgap(10)
+        //gridpane.setHgap(10)
 
 
         //Column width persentage set to 100/8 (7 days + time column + buttons)
@@ -125,15 +127,29 @@ object Weekly_view extends JFXApp3:
           val weekDay = dateTracker.getDayOfWeek.getValue
           var startOfTheWeekDate = dateTracker.minusDays(weekDay - 1)
 
-          for i <- 0 until(7) do
-            if startOfTheWeekDate == convertedDateStart then
+          var currentDate = convertedDateStart
+
+
+          while currentDate.isBefore(convertedDateEnd) || currentDate.isEqual(convertedDateEnd) do
+            if !currentDate.isBefore(startOfTheWeekDate) && currentDate.isBefore(startOfTheWeekDate.plusDays(7)) then
               //gets all the necessaru info such as start and end time and day of the weke
-              val x = Events.getdayOfWeek(dateStart)
-              val y = Events.getHour(dateStart)
-              val minStart = Events.getMin(dateStart).toDouble
-              val x_2 = Events.getdayOfWeek(dateEnd)
-              val y_2 = Events.getHour(dateEnd)
-              val minEnd = Events.getMin(dateEnd).toDouble
+              val x = currentDate.getDayOfWeek.getValue
+              //StartTime and endtim determine whether current date is startDate, EndDate or date in between.
+              var startTime = LocalTime.MIDNIGHT
+              if (currentDate.isEqual(convertedDateStart)) then
+                 startTime = Events.getTime(dateStart)
+
+              var endTime: LocalTime = LocalTime.MAX
+              if currentDate.isEqual(convertedDateEnd) then
+                endTime = Events.getTime(dateEnd)
+
+
+
+              val y = startTime.getHour
+              val minStart = startTime.getMinute.toDouble
+
+              val y_2 = endTime.getHour
+              val minEnd = endTime.getMinute.toDouble
               //Calculates proportion of total days height
               val startTimeRatio = (y + minStart / 60) / 25
               val endTimeRatio = (y_2 + minEnd / 60) / 25
@@ -145,7 +161,7 @@ object Weekly_view extends JFXApp3:
 
               val stack = new StackPane()
               val rectangle = new Rectangle()
-              rectangle.width = 800/10-10
+              rectangle.width = 800/10
               rectangle.height = eventHeight
               rectangle.fill = Color.Green
 
@@ -156,20 +172,27 @@ object Weekly_view extends JFXApp3:
 
 
 
+
+
+
               val label = new Label(Events.getEventName(dateStart))
               stack.getChildren().addAll(rectangle, label)
 
               allEventChildren = allEventChildren.appended(stack)
               gridpane.add(stack, x, y+1)
+
+
+
               //Calculates rowSpan
               var rowSpan = 0
               if minEnd>minStart then
                 rowSpan = 1
               val eventRowSpan = y_2 - y + rowSpan
               GridPane.setRowSpan(stack, eventRowSpan)
+
               //GridPane.setValignment(stack, VPos.Top)
 
-              startOfTheWeekDate = startOfTheWeekDate.plusDays(1)
+            currentDate = currentDate.plusDays(1)
 
         //Deletes all Events that are in the grid
         def deleteEventsFromGrid: Unit =
