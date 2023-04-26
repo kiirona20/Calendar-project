@@ -70,6 +70,7 @@ object Main extends App {
     println(Events.getEventDescription("202305121500"))
     println(Events.getEventEndTime("202305121500"))
     println(Events.getMin("202305121540"))
+    println(Events.getTime("202305121540").toString)
 
 
 

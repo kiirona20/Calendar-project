@@ -1,5 +1,7 @@
-//import javafx.scene.layout.ColumnConstraints
-//import javafx.scene.shape.Rectangle
+
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.{date, dateTime}
+import javafx.util.Callback
+import scalafx.stage.*
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.collections.ObservableBuffer
@@ -8,25 +10,25 @@ import scalafx.beans.binding.Bindings
 import scalafx.scene.Node
 import scalafx.scene.layout.*
 import scalafx.scene.control.*
-import scalafx.scene.layout.GridPane
+import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.event.ActionEvent
 import scalafx.geometry.*
-import scalafx.scene.layout.GridPane.{getHgrow, getRowIndex, getValignment, setConstraints, setHalignment, setMargin, setRowSpan, setValignment}
 import scalafx.scene.input.*
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
-
-import java.util.Date.*
+import scalafx.collections.ObservableBuffer
 import scalafx.stage.Popup
 
-import java.time.LocalTime
+import java.time.{LocalDate, LocalTime}
+import javafx.util.Callback
+import javafx.util.converter.LocalTimeStringConverter
 
-//import java.awt.Insets
 import java.time.temporal.TemporalQueries.localDate
 import scala.annotation.internal.Child
 import scalafx.beans.value.ObservableValue
-import javafx.beans.value.ChangeListener
-//import scalafx.print.PaperSource.Top
+
+import java.time.format.DateTimeFormatter
+
 
 object Weekly_view extends JFXApp3:
 
@@ -41,6 +43,8 @@ object Weekly_view extends JFXApp3:
     val days = List[String]("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
     var dateTracker = Events.getDateToday
     var allEventChildren = List[Node]()
+
+
 
     var sceneWidth = 800.0
     var sceneHeight = 800.0
@@ -81,6 +85,7 @@ object Weekly_view extends JFXApp3:
         val button2 = new Button("-->")
         gridpane.add(button1,8,0)
         gridpane.add(button2,9,0)
+
 
         //Button1 Moves backwards and button2 moves forward a week
         //First they remove Events from the grid.
@@ -156,7 +161,6 @@ object Weekly_view extends JFXApp3:
               //Calculates total height of the Event. The height of the screen is right now 800
               val eventHeight = (endTimeRatio - startTimeRatio) * 800
               // Calculates the Y offset to position the event correctly in the grid
-              // So how much will stack be shifted down
               val eventOffset = (minStart / 60) * (sceneHeight / 25)
 
               val stack = new StackPane()
@@ -183,6 +187,7 @@ object Weekly_view extends JFXApp3:
 
 
 
+
               //Calculates rowSpan
               var rowSpan = 0
               if minEnd>minStart then
@@ -204,18 +209,244 @@ object Weekly_view extends JFXApp3:
 
         root = gridpane
 
-        val contextmenu = new ContextMenu(new MenuItem("Add"), new MenuItem("Edit"), new MenuItem("Delete"))
 
-        // On right click creates a contextMenu anywhere
-        onMouseClicked = (me: MouseEvent) => {
+        def EventInputDialog(): Unit =
+
+          val dialog = new Dialog[(String, String, String, String, String, String)]()
+          dialog.setTitle("Add Event")
+          dialog.setHeaderText("Enter event details")
+          val timePattern = "HH:mm"
+          val format = DateTimeFormatter.ofPattern(timePattern)
+          val timeConverter = new LocalTimeStringConverter(format, format)
+
+
+          val nameLabel = new Label("Event Name:")
+          val nameInput = new TextField()
+          val startDateLabel = new Label("Start Date:")
+          val startDateInput = new DatePicker()
+          val startTimeLable = new Label("Start Time:")
+          val startTimeInput = new TextField()
+          startTimeInput.promptText = "Put time in format HH:mm"
+          //forces user to use specific format :D
+          startTimeInput.textFormatter = new TextFormatter(timeConverter)
+          startDateInput.getEditor.disable = true
+          val endDateLabel = new Label("End Time:")
+          val endDateInput = new DatePicker()
+          endDateInput.getEditor.disable = true
+
+          val endTimeLable = new Label("End Time:")
+          val endTimeInput = new TextField()
+          endTimeInput.promptText = "Put time in format HH:mm"
+          endTimeInput.textFormatter = new TextFormatter(timeConverter)
+
+
+          val descriptionLabel = new Label("Description:")
+          val descriptionInput = new TextField()
+
+          val grid = new GridPane()
+          grid.add(nameLabel, 1, 1)
+          grid.add(nameInput, 2, 1)
+          grid.add(startDateLabel, 1, 2)
+          grid.add(startDateInput, 2, 2)
+          grid.add(startTimeLable, 1, 3)
+          grid.add(startTimeInput, 2, 3)
+
+
+          grid.add(endDateLabel, 1, 4)
+          grid.add(endDateInput, 2, 4)
+          grid.add(endTimeLable, 1, 5)
+          grid.add(endTimeInput, 2, 5)
+
+          grid.add(descriptionLabel, 1, 6)
+          grid.add(descriptionInput, 2, 6)
+
+          dialog.getDialogPane.setContent(grid)
+
+          val submitButtonType = new ButtonType("Submit", ButtonData.OKDone)
+          dialog.getDialogPane.getButtonTypes.addAll(submitButtonType, ButtonType.Cancel)
+
+          // Disables the submit button if any of the fields are empty.
+          // '<==' Binds the right side to the left side so that whenever the value is true from right it disbles the button
+          dialog.getDialogPane.lookupButton(submitButtonType).disable <== nameInput.text.isEmpty || descriptionInput.text.isEmpty || startDateInput.getEditor.text.isEmpty || endDateInput.getEditor.text.isEmpty
+            || startTimeInput.text.isEmpty || endTimeInput.text.isEmpty
+
+
+
+          dialog.resultConverter = button =>
+            if button == submitButtonType then
+              (nameInput.getText,startDateInput.getValue.toString,startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText)
+            else
+              null
+
+          val result = dialog.showAndWait()
+
+          if result.isDefined then
+            userInput(nameInput.getText,startDateInput.getValue.toString, startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText)
+           //Should work with this input = name,202003031700,202003031800, hopefully this works :D
+        def userInput(name: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String) =
+          println(name + dateStart + timeStart + dateEnd + timeEnd + description)
+          val stDate: String = dateStart.replace("-", "")
+          val stTime: String = timeStart.replace(":", "")
+          val stDateTime = stDate+stTime
+          val endDate = dateEnd.replace("-","")
+          val endTime = timeEnd.replace(":","")
+          val endDateTime = endDate+endTime
+          Events.addEvent(name + "," + stDateTime + "," + endDateTime + "," + description)
+          deleteEventsFromGrid
+          Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
+
+
+
+        val contextmenu = new ContextMenu()
+        contextmenu.items.add((new MenuItem("Add"){onAction = () => EventInputDialog()}))
+        contextmenu.items.add((new MenuItem("Edit"){onAction = () => editEventDialog}))
+        contextmenu.items.add((new MenuItem("Delete"){onAction = () => deleteDialog}))
+
+        onMouseClicked = (me: MouseEvent) =>
           if me.button == MouseButton.Secondary then
-            contextmenu.show(this.window(),me.screenX,me.screenY)          }
+            contextmenu.show(this.window(),me.screenX,me.screenY)
+
+        def deleteDialog: Unit =
+          val dialog = new Dialog[Unit]()
+          dialog.setTitle("Delete event")
+          dialog.setHeaderText("Click on Events you wish to delete and then press Delete Button")
+
+          val listView = new ListView(Events.showEvents.toList)
+          listView.prefHeight = 200
+          listView.prefWidth = 200
 
 
-        //shows all the Events :)
-        val listView = new ListView(Events.showEvents.toList)
-        listView.prefHeight = 200
-        listView.prefWidth = 200
+
+          val grid = new GridPane()
+          grid.add(listView,1,1)
+          dialog.getDialogPane.setContent(grid)
+          val deleteButton = new Button("Delete")
+          grid.add(deleteButton,1,2)
+          dialog.getDialogPane.getButtonTypes.addAll( ButtonType.Cancel, ButtonType.Finish)
+          deleteButton.onAction = (e: ActionEvent) =>
+            val selected = listView.selectionModel.apply().getSelectedItem
+            if selected != null then
+              Events.deleteEvent(selected.toString)
+              deleteEventsFromGrid
+              Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
+            listView.items = listView.items.apply().diff(Seq(selected))
+
+
+          dialog.showAndWait()
+
+        def editEventDialog: Unit =
+          val dialog = new Dialog[Unit]()
+          dialog.setTitle("Edit event")
+          dialog.setHeaderText("Click on the event you wish to edit and press edit Button")
+
+          val listView = new ListView(Events.showEvents.toList)
+          listView.prefHeight = 200
+          listView.prefWidth = 200
+
+
+          val grid = new GridPane()
+          grid.add(listView,1,1)
+          dialog.getDialogPane.setContent(grid)
+          val deleteButton = new Button("Edit")
+          grid.add(deleteButton,1,2)
+          dialog.getDialogPane.getButtonTypes.addAll( ButtonType.Cancel, ButtonType.Finish)
+          deleteButton.onAction = (e: ActionEvent) =>
+            val selected = listView.selectionModel.apply().getSelectedItem
+            if selected != null then
+              processEditDialog(selected.toString)
+          dialog.showAndWait()
+
+        def processEditDialog(key: String) =
+
+          val dialog = new Dialog[Unit]()
+          val grid = new GridPane()
+          dialog.setTitle("Editor")
+          dialog.setHeaderText("Choose what you want to edit")
+
+
+          val timePattern = "HH:mm"
+          val format = DateTimeFormatter.ofPattern(timePattern)
+          val timeConverter = new LocalTimeStringConverter(format, format)
+
+
+          val nameLabel = new Label("Event Name:")
+          val nameInput = new TextField()
+          nameInput.setText(Events.getEventName(key))
+          val startDateLabel = new Label("Start Date:")
+          val startDateInput = new DatePicker(Events.convertDate(key))
+          val startTimeLable = new Label("Start Time:")
+          val startTimeInput = new TextField()
+          startTimeInput.textFormatter = new TextFormatter(timeConverter)
+          startTimeInput.setText(Events.getTime(key).toString)
+
+          //forces user to use specific format :D
+          //startTimeInput.textFormatter = new TextFormatter(timeConverter)
+          startDateInput.getEditor.disable = true
+          val endDateLabel = new Label("End Time:")
+          val endDateInput = new DatePicker(Events.convertDate(Events.getEventEndTime(key)))
+          endDateInput.getEditor.disable = true
+
+          val endTimeLable = new Label("End Time:")
+          val endTimeInput = new TextField()
+          endTimeInput.textFormatter = new TextFormatter(timeConverter)
+
+          endTimeInput.setText(Events.getTime(Events.getEventEndTime(key)).toString)
+
+
+          val descriptionLabel = new Label("Description:")
+          val descriptionInput = new TextField()
+          descriptionInput.setText(Events.getEventDescription(key))
+
+          grid.add(nameLabel, 1, 1)
+          grid.add(nameInput, 2, 1)
+          grid.add(startDateLabel, 1, 2)
+          grid.add(startDateInput, 2, 2)
+          grid.add(startTimeLable, 1, 3)
+          grid.add(startTimeInput, 2, 3)
+
+
+          grid.add(endDateLabel, 1, 4)
+          grid.add(endDateInput, 2, 4)
+          grid.add(endTimeLable, 1, 5)
+          grid.add(endTimeInput, 2, 5)
+
+          grid.add(descriptionLabel, 1, 6)
+          grid.add(descriptionInput, 2, 6)
+
+          dialog.getDialogPane.setContent(grid)
+
+          dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel)
+
+          val updateButton = new Button("Update")
+          grid.add(updateButton, 2, 7)
+
+          val oldName = Events.getEventName(key)
+          val oldStartDate = key
+          val oldEndDate= Events.getEventEndTime(key)
+          val oldDescription = Events.getEventDescription(key)
+
+
+
+          updateButton.onAction = (e: ActionEvent) =>
+            val newName = if nameInput.text != null then nameInput.getText else oldName
+            val newStartDate = startDateInput.getValue.toString.replace("-","") + startTimeInput.getText.replace(":","")
+            val newEndDate = endDateInput.getValue.toString.replace("-","") + startTimeInput.getText.toString.replace(":","")
+            val newDescription = if descriptionInput.text != null then descriptionInput.getText else oldDescription
+
+            Events.editEvent(key,(oldStartDate,newStartDate))
+            Events.editEvent(key,(oldEndDate,newEndDate))
+            Events.editEvent(key,(oldDescription,newDescription))
+            Events.editEvent(key,(oldName,newName))
+            dialog.close()
+
+
+
+
+
+          dialog.showAndWait()
+
+
+
 
 
 
