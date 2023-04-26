@@ -148,8 +148,6 @@ object Weekly_view extends JFXApp3:
               if currentDate.isEqual(convertedDateEnd) then
                 endTime = Events.getTime(dateEnd)
 
-
-
               val y = startTime.getHour
               val minStart = startTime.getMinute.toDouble
 
@@ -174,18 +172,19 @@ object Weekly_view extends JFXApp3:
               //Shifts down the stack
               stack.setTranslateY(eventOffset)
 
-
-
-
-
+              val tooltip = new Tooltip()
+              tooltip.setText("Event name: " + Events.getEventName(dateStart) + "\n" +
+              "Event start time: " + Events.convertDate(dateStart) + "\n" +
+                "Event end time: " + Events.convertDate(dateEnd) + "\n" +
+                "Event description: " + Events.getEventDescription(dateStart))
 
               val label = new Label(Events.getEventName(dateStart))
+              Tooltip.install(stack,tooltip)
+
               stack.getChildren().addAll(rectangle, label)
 
               allEventChildren = allEventChildren.appended(stack)
               gridpane.add(stack, x, y+1)
-
-
 
 
               //Calculates rowSpan
@@ -195,7 +194,7 @@ object Weekly_view extends JFXApp3:
               val eventRowSpan = y_2 - y + rowSpan
               GridPane.setRowSpan(stack, eventRowSpan)
 
-              //GridPane.setValignment(stack, VPos.Top)
+
 
             currentDate = currentDate.plusDays(1)
 
