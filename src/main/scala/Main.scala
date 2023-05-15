@@ -34,13 +34,13 @@ object Main extends App {
 
 
 
-  val testEvent = "name,202305121500,202003032000, hopefully this works :D"
+  val testEvent = "20230512T150000,20200303T200000, hopefully this works :D, CONFERENCE, JOTAINTJOIANT,20230512T150000"
 
 
 
 @main
   def testWriting =
-    Events.writetoFile(Events.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "202003031700z", "202003031800z",  "hopefully this works :D")))
+    Events.writetoFile(Events.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "20230512T150000z", "20230512T200000z",  "hopefully this works :D")))
 @main
   def testReading = println(Events.readFile)
 
@@ -53,10 +53,10 @@ object Main extends App {
 
 @main
   def testDelete =
-    Events.deleteEvent("202003031900")
+    Events.deleteEvent("20230512150000")
 @main
   def testEdit =
-    Events.editEvent("202003031700",("hopefully this works :D","jotain"))
+    Events.editEvent("20230512150000",(" hopefully this works :D","jotain"))
 @main
   def testdateformat =
     println(Events.getdayOfWeek("202303031700")) // Friday
@@ -66,11 +66,11 @@ object Main extends App {
     println(Events.getHour("202303031700"))
 @main
   def testgetInfo =
-    println(Events.getEventName("202305121500"))
-    println(Events.getEventDescription("202305121500"))
-    println(Events.getEventEndTime("202305121500"))
-    println(Events.getMin("202305121540"))
-    println(Events.getTime("202305121540").toString)
+    println(Events.getEventName("20230512112000"))
+    println(Events.getEventDescription("20230512112000"))
+    println(Events.getEventEndTime("20230512112000"))
+    println(Events.getMin("20230512154000"))
+    println(Events.getTime("20230512154000").toString)
 
 
 

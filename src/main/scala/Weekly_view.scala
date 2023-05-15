@@ -1,10 +1,7 @@
 
-import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.{date, dateTime}
-import javafx.util.Callback
 import scalafx.stage.*
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.beans.binding.Bindings
 import scalafx.scene.Node
@@ -12,28 +9,20 @@ import scalafx.scene.layout.*
 import scalafx.scene.control.*
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.event.ActionEvent
-import scalafx.geometry.*
 import scalafx.scene.input.*
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
-import scalafx.collections.ObservableBuffer
-import scalafx.stage.Popup
+import sys.process._
 
 import java.time.{LocalDate, LocalTime}
-import javafx.util.Callback
 import javafx.util.converter.LocalTimeStringConverter
-
-import java.time.temporal.TemporalQueries.localDate
-import scala.annotation.internal.Child
-import scalafx.beans.value.ObservableValue
+import scalafx.geometry.Pos
 
 import java.time.format.DateTimeFormatter
+import scala.annotation.internal.Child
 
 
 object Weekly_view extends JFXApp3:
-
-
-
 
 
 
@@ -59,6 +48,7 @@ object Weekly_view extends JFXApp3:
         gridpane.gridLinesVisible = true
         //sets gaps between the "days"
         //gridpane.setHgap(10)
+
 
 
         //Column width persentage set to 100/8 (7 days + time column + buttons)
@@ -93,7 +83,7 @@ object Weekly_view extends JFXApp3:
         button1.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.minusWeeks(1)
           date.text = dateTracker.toString
-          deleteEventsFromGrid
+
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
 
         }
@@ -214,7 +204,7 @@ object Weekly_view extends JFXApp3:
           val dialog = new Dialog[(String, String, String, String, String, String)]()
           dialog.setTitle("Add Event")
           dialog.setHeaderText("Enter event details")
-          val timePattern = "HH:mm"
+          val timePattern = "HH:mm:ss"
           val format = DateTimeFormatter.ofPattern(timePattern)
           val timeConverter = new LocalTimeStringConverter(format, format)
 
@@ -225,22 +215,34 @@ object Weekly_view extends JFXApp3:
           val startDateInput = new DatePicker()
           val startTimeLable = new Label("Start Time:")
           val startTimeInput = new TextField()
-          startTimeInput.promptText = "Put time in format HH:mm"
+          startTimeInput.promptText = "Put time in format HH:mm:ss"
           //forces user to use specific format :D
           startTimeInput.textFormatter = new TextFormatter(timeConverter)
           startDateInput.getEditor.disable = true
-          val endDateLabel = new Label("End Time:")
+          val endDateLabel = new Label("End Date:")
           val endDateInput = new DatePicker()
           endDateInput.getEditor.disable = true
 
           val endTimeLable = new Label("End Time:")
           val endTimeInput = new TextField()
-          endTimeInput.promptText = "Put time in format HH:mm"
+          endTimeInput.promptText = "Put time in format HH:mm:ss"
           endTimeInput.textFormatter = new TextFormatter(timeConverter)
 
 
           val descriptionLabel = new Label("Description:")
           val descriptionInput = new TextField()
+
+          val categoryLabel = new Label("Category:")
+          val categoryInput = new TextField()
+
+          val alarmdateLabel = new Label("Alarm date")
+          val alarmdateInput = new DatePicker()
+
+          val alarmtimeLabel = new Label("Alarm time")
+          val alarmtimeInput = new TextField()
+
+          alarmtimeInput.textFormatter = new TextFormatter(timeConverter)
+
 
           val grid = new GridPane()
           grid.add(nameLabel, 1, 1)
@@ -258,6 +260,15 @@ object Weekly_view extends JFXApp3:
 
           grid.add(descriptionLabel, 1, 6)
           grid.add(descriptionInput, 2, 6)
+
+          grid.add(categoryLabel,1,7)
+          grid.add(categoryInput,2,7)
+
+          grid.add(alarmdateLabel,1,8)
+          grid.add(alarmdateInput,2,8)
+
+          grid.add(alarmtimeLabel,1,9)
+          grid.add(alarmtimeInput,2,9)
 
           dialog.getDialogPane.setContent(grid)
 
