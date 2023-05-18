@@ -84,7 +84,7 @@ object Weekly_view extends JFXApp3:
         button1.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.minusWeeks(1)
           date.text = dateTracker.toString
-
+          deleteEventsFromGrid
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
 
         }

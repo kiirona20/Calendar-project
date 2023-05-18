@@ -35,7 +35,11 @@ object Main extends App {
 
 
 
-  val testEvent = "20230512T150000,20200303T200000, hopefully this works :D, CONFERENCE, JOTAINTJOIANT,20230512T150000"
+  val testEvent = "20230512160000,20230513190000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT2,20230512110000"
+  val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512120000"
+  val testEvent3 = "20230512140000,20230512160000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512130000"
+  val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512140000"
+
 
 
 
@@ -46,18 +50,18 @@ object Main extends App {
   def testReading = println(Events.readFile)
 
 @main
-  def testAdding = Events.addEvent(testEvent) // start time should be unique
+  def testAdding = Events.addEvent(testEvent4) // start time should be unique
 
-//@main
-  //def testIcalendar =
-    //println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
+@main
+  def testIcalendar =
+    println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
 
 @main
   def testDelete =
     Events.deleteEvent("20230512150000")
 @main
   def testEdit =
-    Events.editEvent("20230512150000",(" CONFERENCE","jotain"))
+    Events.editEvent("20230512160000", ("CONFERENCE", "jotain1"))
 @main
   def testdateformat =
     println(Events.getdayOfWeek("202303031700")) // Friday

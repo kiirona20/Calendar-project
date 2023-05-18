@@ -36,14 +36,20 @@ object Events {
   //resultVcalendar is in ICS format. these indexes will be modified by program.
   //IcalendarFormat converts given Seq[String] to the correct format so it can be written to the file
 
-  def checkAlarm(alarm: String, correctDateFormat: DateTimeFormatter) =
+  def checkAlarm(alarm: String) =
     try
-      LocalDateTime.parse(alarm,correctDateFormat)
+      LocalDateTime.parse(alarm,dateFormat)
       true
     catch
       case ex: Exception => false
 
-  def iCalendarFormat(linestoedit: Seq[String], dateFormate: DateTimeFormatter): Map[String, Seq[String]] =
+  def checkToPad(lines: Seq[String]) =
+    val remainder = lines.length % 7
+    val padLength = if remainder != 0 then 7 - remainder else 0
+    val paddedLinesToEdit = lines.padTo(lines.length + padLength, "")
+    paddedLinesToEdit
+
+  def iCalendarFormat(linestoedit: Seq[String]): Map[String, Seq[String]] =
     //randomUUID creates random UUID for the Ics format
     //Date is the key :D
     //Date should be located at index 1
@@ -51,24 +57,25 @@ object Events {
 
     // Checks if the linestoEdit is not empty
     var i = 0
-    val paddedLinesToEdit = if (linestoedit.length < 7) linestoedit.padTo(7, "") else linestoedit
 
-    println(paddedLinesToEdit(i+6))
-    println(paddedLinesToEdit(i+1))
+    val remainder = linestoedit.length % 7
+    val padLength = if remainder != 0 then 7 - remainder else 0
+    val paddedLinesToEdit = linestoedit.padTo(linestoedit.length + padLength, "")
+    //println(paddedLinesToEdit.length)
 
     if linestoedit.size > 0 then
-      while i < linestoedit.length do
-        val alarm = if checkAlarm(paddedLinesToEdit(i+6), dateFormate) then "BEGIN:VALARM\nACTION:AUDIO\n" +
-          "TRIGGER:" + paddedLinesToEdit(i+6) + "z\n"+ "END:VALARM\n" else ""
+      while i < paddedLinesToEdit.length do
+        val alarm = if checkAlarm(paddedLinesToEdit(i+6)) then "BEGIN:VALARM\nACTION:AUDIO\n" +
+          "TRIGGER:" + paddedLinesToEdit(i+6).patch(8,"T",0)  + "z\n"+ "END:VALARM\n" else ""
         empty = empty ++ (Map[String,Seq[String]](linestoedit(i+1)-> Seq[String](
         "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\nBEGIN:VEVENT\n",
         "UID:" + paddedLinesToEdit(i)+"\n",
         "DTSTAMP:" + LocalDateTime.now().toString.replace("-","").replace(":","").takeWhile((i)=>i != '.') + "z\n",
-        "DTSTART:" + paddedLinesToEdit(i+1) + "z\n",
-        "DTEND:" + paddedLinesToEdit(i+2) + "z\n",
+        "DTSTART:" + paddedLinesToEdit(i+1).patch(8,"T",0) + "z\n",
+        "DTEND:" + paddedLinesToEdit(i+2).patch(8,"T",0) + "z\n",
         "SUMMARY:" + paddedLinesToEdit(i+3) + "\n",
-        if paddedLinesToEdit(i+5) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+5) + "\n",
-        "DESCRIPTION:" + paddedLinesToEdit(i+4) + "\n",
+        if paddedLinesToEdit(i+4) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+4) + "\n",
+        "DESCRIPTION:" + paddedLinesToEdit(i+5) + "\n",
          alarm,
         "END:VEVENT\n\nEND:VCALENDAR\n\n")))
         i += 7
@@ -94,7 +101,9 @@ object Events {
     var mapData =  (Seq[String](),Seq[Int]())
     oneline = lineReader.readLine()
     while oneline != null do
-
+      //start new map data for new event
+      if oneline.contains("BEGIN:VEVENT") then
+          mapData = (Seq[String](),Seq[Int]())
 
       if oneline.contains("UID:") then
         //adds UID
@@ -126,12 +135,14 @@ object Events {
       if oneline.contains("TRIGGER:") then
         val data = (oneline.slice(8,16) + oneline.slice(17,23),7)
         mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
+      if oneline.contains("END:VEVENT") then
+      // adds mapData to storedEvents for the current event when the event ends
+        storedEvents = storedEvents + (mapKey->mapData._1.zip(mapData._2).sortBy(_._2).map(_._1))
 
 
       oneline = lineReader.readLine()
     //zipping seq[String] and Seq[Int] and the sorting them by Int
     //storedEvents will always have the same order, so it will be easier to manipulate data afterwards.
-    storedEvents = storedEvents + (mapKey->mapData._1.zip(mapData._2).sortBy(_._2).map(_._1))
     storedEvents
 
 
@@ -141,13 +152,15 @@ object Events {
     // Generates new UID
     val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
     val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
-    val formattedUserInput = iCalendarFormat(userInputToSeq, dateFormat2)
-    println(formattedUserInput)
+    val formattedUserInput = iCalendarFormat(userInputToSeq)
+    println(readFile.size)
+    println(readFile)
     if readFile.size > 1 then
       val readFileValues = readFile.map((i)=>i._2).reduce(_++_)
-      writetoFile(iCalendarFormat(readFileValues, dateFormat) ++ formattedUserInput)
+      println(readFileValues)
+      writetoFile(iCalendarFormat(readFileValues) ++ formattedUserInput)
     else if readFile.size == 1 then
-      writetoFile(iCalendarFormat(readFile.values.toSeq(0), dateFormat)++formattedUserInput)
+      writetoFile(iCalendarFormat(readFile.values.toSeq(0))++formattedUserInput)
     else
       writetoFile(formattedUserInput)
 
@@ -174,7 +187,7 @@ object Events {
     listOfEvents = listOfEvents.updated(userInput, updatedList)
     println(listOfEvents)
     println(listOfEvents.values.reduce(_++_))
-    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_),dateFormat))
+    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_)))
 
 
 
@@ -185,7 +198,7 @@ object Events {
     var mapToWrite = Seq[String]()
     if readFile.size > 1 then
       mapToWrite = readFile.-(userInput).values.reduce(_++_)
-      writetoFile(iCalendarFormat(mapToWrite,dateFormat))
+      writetoFile(iCalendarFormat(mapToWrite))
     else
      writetoFile(Map(""->mapToWrite))
 
@@ -212,7 +225,7 @@ object Events {
   def getTime(date: String) =
     LocalTime.parse(date,dateFormat)
 
-  def getMin(date: String) = 
+  def getMin(date: String) =
     LocalDateTime.parse(date,dateFormat).getMinute
 
   def convertDate(date: String) =
