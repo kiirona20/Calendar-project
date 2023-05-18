@@ -71,13 +71,14 @@ object Main extends App {
     println(Events.getHour("202303031700"))
 @main
   def testgetInfo =
-    println(Events.getEventName("20230513110000"))
-    println(Events.getEventDescription("20230513110000"))
-    println(Events.getEventEndTime("20230513110000"))
+    //println(Events.getEventName("20230513110000"))
+    //println(Events.getEventDescription("20230513110000"))
+    //println(Events.getEventEndTime("20230513110000"))
 
     println(Events.getMin("20230513110000"))
     println(Events.getTime("20230513110000").toString)
-
+    println(Events.groupedByCategories)
+    println(Events.allCategories)
 
 
 

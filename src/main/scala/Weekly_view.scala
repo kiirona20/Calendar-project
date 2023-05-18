@@ -86,14 +86,14 @@ object Weekly_view extends JFXApp3:
           date.text = dateTracker.toString
           deleteEventsFromGrid
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
-
+          applyCategoryFilter()
         }
         button2.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.plusWeeks(1)
           date.text = dateTracker.toString
           deleteEventsFromGrid
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
-
+          applyCategoryFilter()
 
         }
 
@@ -332,6 +332,52 @@ object Weekly_view extends JFXApp3:
         contextmenu.items.add((new MenuItem("Add"){onAction = () => EventInputDialog()}))
         contextmenu.items.add((new MenuItem("Edit"){onAction = () => editEventDialog}))
         contextmenu.items.add((new MenuItem("Delete"){onAction = () => deleteDialog}))
+        contextmenu.items.add(new MenuItem("Categories"){onAction = () => categoriesDialog})
+
+        //could be also settings :D
+        def categoriesDialog: Unit = {
+          val dialog = new Dialog[Unit]()
+          dialog.setTitle("Categories")
+          dialog.setHeaderText("Here you can edit categories and view events by categories.")
+
+          // List of all categories
+          val allCategories = Events.allCategories
+          val eventsGroupedByCategories = Events.groupedByCategories
+
+          // Create checkboxes for all categories
+          val checkboxes = allCategories.map { category =>
+            val checkbox = new CheckBox(category)
+            checkbox.selected = AppState.selectedCategories.contains(category)
+            checkbox
+          }
+
+          val grid = new GridPane()
+          checkboxes.zipWithIndex.foreach { case (checkbox, i) =>
+              grid.add(checkbox, 1, i + 1)
+          }
+
+          dialog.getDialogPane.setContent(grid)
+
+          val submitButtonType = new ButtonType("Submit", ButtonData.OKDone)
+          dialog.getDialogPane.getButtonTypes.addAll(submitButtonType, ButtonType.Cancel)
+
+          dialog.resultConverter = button => {
+              if (button == submitButtonType) {
+                  // Filter events by the selected categories and set them to the grid
+                  AppState.selectedCategories = checkboxes.filter(_.selected.value).map(_.text.value).toList
+                  applyCategoryFilter()
+              }
+          }
+
+          dialog.showAndWait()
+      }
+        def applyCategoryFilter(): Unit = {
+            val eventsGroupedByCategories = Events.groupedByCategories
+            deleteEventsFromGrid
+            AppState.selectedCategories.foreach { category =>
+                eventsGroupedByCategories(category).foreach(i => setEventstoGrid(i._1, Events.getEventEndTime(i._1)))
+            }
+        }
 
         onMouseClicked = (me: MouseEvent) =>
           if me.button == MouseButton.Secondary then
@@ -364,6 +410,9 @@ object Weekly_view extends JFXApp3:
 
 
           dialog.showAndWait()
+        object AppState {
+          var selectedCategories: List[String] = Nil
+          }
 
         def editEventDialog: Unit =
           val dialog = new Dialog[Unit]()

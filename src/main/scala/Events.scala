@@ -218,6 +218,15 @@ object Events {
   def getEventDescription(key: String) =
     readFile(key)(4)
   // 0 = UID 1 = start time 2 = end time 3 = summary  4 = description 5 = categories 6 = alarm
+  def getCategorie(key: String) =
+    readFile(key)(5)
+
+  def groupedByCategories =
+    readFile.groupBy((i)=>i._2(5))
+
+  def allCategories =
+    groupedByCategories.keys
+    
 
   def showEvents = readFile.keys
 
