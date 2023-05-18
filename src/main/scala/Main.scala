@@ -7,6 +7,7 @@ object Main extends App {
 
   println("Choose to add an event, edit event or delete an event")
   var userInput = readLine()
+
   if userInput.toLowerCase == "add" then
     println("Write the event name, date, starTime, endTime and description. Seperate these by comma ','")
     userInput = readLine()
@@ -38,25 +39,25 @@ object Main extends App {
 
 
 
-@main
-  def testWriting =
-    Events.writetoFile(Events.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "20230512T150000z", "20230512T200000z",  "hopefully this works :D")))
+//@main
+  //def testWriting =
+    //Events.writetoFile(Events.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "20230512T150000z", "20230512T200000z",  "hopefully this works :D")))
 @main
   def testReading = println(Events.readFile)
 
 @main
   def testAdding = Events.addEvent(testEvent) // start time should be unique
 
-@main
-  def testIcalendar =
-    println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
+//@main
+  //def testIcalendar =
+    //println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
 
 @main
   def testDelete =
     Events.deleteEvent("20230512150000")
 @main
   def testEdit =
-    Events.editEvent("20230512150000",(" hopefully this works :D","jotain"))
+    Events.editEvent("20230512150000",(" CONFERENCE","jotain"))
 @main
   def testdateformat =
     println(Events.getdayOfWeek("202303031700")) // Friday

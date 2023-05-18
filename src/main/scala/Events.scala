@@ -36,14 +36,14 @@ object Events {
   //resultVcalendar is in ICS format. these indexes will be modified by program.
   //IcalendarFormat converts given Seq[String] to the correct format so it can be written to the file
 
-  def checkAlarm(alarm: String) =
+  def checkAlarm(alarm: String, correctDateFormat: DateTimeFormatter) =
     try
-      LocalDateTime.parse(alarm,dateFormat)
+      LocalDateTime.parse(alarm,correctDateFormat)
       true
     catch
       case ex: Exception => false
 
-  def iCalendarFormat(linestoedit: Seq[String]): Map[String, Seq[String]] =
+  def iCalendarFormat(linestoedit: Seq[String], dateFormate: DateTimeFormatter): Map[String, Seq[String]] =
     //randomUUID creates random UUID for the Ics format
     //Date is the key :D
     //Date should be located at index 1
@@ -51,21 +51,24 @@ object Events {
 
     // Checks if the linestoEdit is not empty
     var i = 0
-    println(linestoedit(i+6))
+    val paddedLinesToEdit = if (linestoedit.length < 7) linestoedit.padTo(7, "") else linestoedit
+
+    println(paddedLinesToEdit(i+6))
+    println(paddedLinesToEdit(i+1))
+
     if linestoedit.size > 0 then
       while i < linestoedit.length do
-        val alarm = if linestoedit.length >= i+6 && checkAlarm(linestoedit(i+6)) then "BEGIN:VALARM\nACTION:AUDIO\n" +
-          "TRIGGER:" + linestoedit(i+6) + "z\n"+ "END:VALARM\n" else ""
-        println(alarm)
+        val alarm = if checkAlarm(paddedLinesToEdit(i+6), dateFormate) then "BEGIN:VALARM\nACTION:AUDIO\n" +
+          "TRIGGER:" + paddedLinesToEdit(i+6) + "z\n"+ "END:VALARM\n" else ""
         empty = empty ++ (Map[String,Seq[String]](linestoedit(i+1)-> Seq[String](
         "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\nBEGIN:VEVENT\n",
-        "UID:" + linestoedit(i)+"\n",
+        "UID:" + paddedLinesToEdit(i)+"\n",
         "DTSTAMP:" + LocalDateTime.now().toString.replace("-","").replace(":","").takeWhile((i)=>i != '.') + "z\n",
-        "DTSTART:" + linestoedit(i+1) + "z\n",
-        "DTEND:" + linestoedit(i+2) + "z\n",
-        "SUMMARY:" + linestoedit(i+3) + "\n",
-        "CATEGORIES:" + linestoedit(i+4) + "\n",
-        "DESCRIPTION:" + linestoedit(i+5) + "\n",
+        "DTSTART:" + paddedLinesToEdit(i+1) + "z\n",
+        "DTEND:" + paddedLinesToEdit(i+2) + "z\n",
+        "SUMMARY:" + paddedLinesToEdit(i+3) + "\n",
+        if paddedLinesToEdit(i+5) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+5) + "\n",
+        "DESCRIPTION:" + paddedLinesToEdit(i+4) + "\n",
          alarm,
         "END:VEVENT\n\nEND:VCALENDAR\n\n")))
         i += 7
@@ -125,7 +128,6 @@ object Events {
         mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
 
 
-
       oneline = lineReader.readLine()
     //zipping seq[String] and Seq[Int] and the sorting them by Int
     //storedEvents will always have the same order, so it will be easier to manipulate data afterwards.
@@ -139,13 +141,13 @@ object Events {
     // Generates new UID
     val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
     val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
-    val formattedUserInput = iCalendarFormat(userInputToSeq)
+    val formattedUserInput = iCalendarFormat(userInputToSeq, dateFormat2)
     println(formattedUserInput)
     if readFile.size > 1 then
       val readFileValues = readFile.map((i)=>i._2).reduce(_++_)
-      writetoFile(iCalendarFormat(readFileValues) ++ formattedUserInput)
+      writetoFile(iCalendarFormat(readFileValues, dateFormat) ++ formattedUserInput)
     else if readFile.size == 1 then
-      writetoFile(iCalendarFormat(readFile.values.toSeq(0))++formattedUserInput)
+      writetoFile(iCalendarFormat(readFile.values.toSeq(0), dateFormat)++formattedUserInput)
     else
       writetoFile(formattedUserInput)
 
@@ -172,7 +174,7 @@ object Events {
     listOfEvents = listOfEvents.updated(userInput, updatedList)
     println(listOfEvents)
     println(listOfEvents.values.reduce(_++_))
-    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_)))
+    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_),dateFormat))
 
 
 
@@ -183,7 +185,7 @@ object Events {
     var mapToWrite = Seq[String]()
     if readFile.size > 1 then
       mapToWrite = readFile.-(userInput).values.reduce(_++_)
-      writetoFile(iCalendarFormat(mapToWrite))
+      writetoFile(iCalendarFormat(mapToWrite,dateFormat))
     else
      writetoFile(Map(""->mapToWrite))
 

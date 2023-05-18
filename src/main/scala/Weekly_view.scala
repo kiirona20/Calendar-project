@@ -12,13 +12,14 @@ import scalafx.event.ActionEvent
 import scalafx.scene.input.*
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
-import sys.process._
 
+import sys.process.*
 import java.time.{LocalDate, LocalTime}
 import javafx.util.converter.LocalTimeStringConverter
 import scalafx.geometry.Pos
 
 import java.time.format.DateTimeFormatter
+import java.util.OptionalInt
 import scala.annotation.internal.Child
 
 
@@ -201,7 +202,7 @@ object Weekly_view extends JFXApp3:
 
         def EventInputDialog(): Unit =
 
-          val dialog = new Dialog[(String, String, String, String, String, String)]()
+          val dialog = new Dialog[(String, String, String, String, String, String, Option[String], Option[String], Option[String])]()
           dialog.setTitle("Add Event")
           dialog.setHeaderText("Enter event details")
           val timePattern = "HH:mm:ss"
@@ -284,16 +285,18 @@ object Weekly_view extends JFXApp3:
 
           dialog.resultConverter = button =>
             if button == submitButtonType then
-              (nameInput.getText,startDateInput.getValue.toString,startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText)
+              (nameInput.getText, startDateInput.getValue.toString, startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText,
+              Option(alarmdateInput.getValue.toString), Option(alarmtimeInput.getText), Option(categoryInput.getText))
             else
               null
 
           val result = dialog.showAndWait()
 
           if result.isDefined then
-            userInput(nameInput.getText,startDateInput.getValue.toString, startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText)
+            userInput(nameInput.getText,startDateInput.getValue.toString, startTimeInput.getText, endDateInput.getValue.toString, endTimeInput.getText, descriptionInput.getText, Option(alarmdateInput.getValue.toString),
+            Option(alarmtimeInput.getText),Option(categoryInput.getText))
            //Should work with this input = name,202003031700,202003031800, hopefully this works :D
-        def userInput(name: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String) =
+        def userInput(name: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, alarmDate: Option[String], alarmTime: Option[String], category: Option[String]) =
           println(name + dateStart + timeStart + dateEnd + timeEnd + description)
           val stDate: String = dateStart.replace("-", "")
           val stTime: String = timeStart.replace(":", "")
@@ -301,7 +304,11 @@ object Weekly_view extends JFXApp3:
           val endDate = dateEnd.replace("-","")
           val endTime = timeEnd.replace(":","")
           val endDateTime = endDate+endTime
-          Events.addEvent(name + "," + stDateTime + "," + endDateTime + "," + description)
+          val alarDate = alarmDate.getOrElse("").replace("-","")
+          val alarTime = alarmTime.getOrElse("").replace(":","")
+          val alarmDateTIme = alarDate + alarTime
+          val categ = category.getOrElse("")
+          Events.addEvent(name + "," + stDateTime + "," + endDateTime + "," + description + "," + categ + "," + alarmDateTIme)
           deleteEventsFromGrid
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
 
