@@ -43,11 +43,11 @@ object Events {
     catch
       case ex: Exception => false
 
-  def checkToPad(lines: Seq[String]) =
-    val remainder = lines.length % 7
-    val padLength = if remainder != 0 then 7 - remainder else 0
-    val paddedLinesToEdit = lines.padTo(lines.length + padLength, "")
-    paddedLinesToEdit
+  //def checkToPad(lines: Seq[String]) =
+    //val remainder = lines.length % 7
+    //val padLength = if remainder != 0 then 7 - remainder else 0
+    //val paddedLinesToEdit = lines.padTo(lines.length + padLength, "")
+    //paddedLinesToEdit
 
   def iCalendarFormat(linestoedit: Seq[String]): Map[String, Seq[String]] =
     //randomUUID creates random UUID for the Ics format
@@ -74,8 +74,8 @@ object Events {
         "DTSTART:" + paddedLinesToEdit(i+1).patch(8,"T",0) + "z\n",
         "DTEND:" + paddedLinesToEdit(i+2).patch(8,"T",0) + "z\n",
         "SUMMARY:" + paddedLinesToEdit(i+3) + "\n",
-        if paddedLinesToEdit(i+4) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+4) + "\n",
-        "DESCRIPTION:" + paddedLinesToEdit(i+5) + "\n",
+        "DESCRIPTION:" + paddedLinesToEdit(i+4) + "\n",
+        if paddedLinesToEdit(i+5) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+5) + "\n",
          alarm,
         "END:VEVENT\n\nEND:VCALENDAR\n\n")))
         i += 7
@@ -126,12 +126,13 @@ object Events {
         //adds Summary
         val data = (oneline.drop(8),4)
         mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("CATEGORIES:") then
-        val data = (oneline.drop(11),5)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
       if oneline.contains("DESCRIPTION:") then
-        val data = (oneline.drop(12),6)
+        val data = (oneline.drop(12),5)
         mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
+      if oneline.contains("CATEGORIES:") then
+        val data = (oneline.drop(11),6)
+        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
+
       if oneline.contains("TRIGGER:") then
         val data = (oneline.slice(8,16) + oneline.slice(17,23),7)
         mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
@@ -153,16 +154,22 @@ object Events {
     val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
     val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
     val formattedUserInput = iCalendarFormat(userInputToSeq)
-    println(readFile.size)
-    println(readFile)
-    if readFile.size > 1 then
-      val readFileValues = readFile.map((i)=>i._2).reduce(_++_)
-      println(readFileValues)
-      writetoFile(iCalendarFormat(readFileValues) ++ formattedUserInput)
-    else if readFile.size == 1 then
-      writetoFile(iCalendarFormat(readFile.values.toSeq(0))++formattedUserInput)
-    else
-      writetoFile(formattedUserInput)
+
+    val existingEvents = readFile
+
+    //format all existing events
+    val formattedExistingEvents = existingEvents.flatMap((i)=>iCalendarFormat(i._2))
+
+
+    //add new event to existing events
+    val updatedEvents = formattedExistingEvents ++ (formattedUserInput)
+
+    writetoFile(updatedEvents)
+
+
+
+
+
 
 
   def showEventDetails(userInput: String) = readFile(userInput)
@@ -185,9 +192,11 @@ object Events {
     val updatedList = listOfEvents(userInput).updated(index, whatToEdit._2)
 
     listOfEvents = listOfEvents.updated(userInput, updatedList)
-    println(listOfEvents)
-    println(listOfEvents.values.reduce(_++_))
-    writetoFile(iCalendarFormat(listOfEvents.values.reduce(_++_)))
+
+    val formattedExistingEvents = listOfEvents.flatMap((i)=>iCalendarFormat(i._2))
+
+
+    writetoFile(formattedExistingEvents)
 
 
 
@@ -195,12 +204,11 @@ object Events {
 
 // implement method when maptowrite size is
   def deleteEvent(userInput: String) =
-    var mapToWrite = Seq[String]()
     if readFile.size > 1 then
-      mapToWrite = readFile.-(userInput).values.reduce(_++_)
-      writetoFile(iCalendarFormat(mapToWrite))
+      val updatedMap = readFile - userInput
+      writetoFile(updatedMap.flatMap((i)=>iCalendarFormat(i._2)))
     else
-     writetoFile(Map(""->mapToWrite))
+      writetoFile(Map.empty[String, Seq[String]])
 
   def getEventName(key: String) =
     readFile(key)(3)
@@ -208,8 +216,8 @@ object Events {
   def getEventEndTime(key: String) =
     readFile(key)(2)
   def getEventDescription(key: String) =
-    readFile(key)(5)
-  // 0 = UID 1 = start time 2 = end time 3 = summary  4 = categories 5 = description 6 = alarm
+    readFile(key)(4)
+  // 0 = UID 1 = start time 2 = end time 3 = summary  4 = description 5 = categories 6 = alarm
 
   def showEvents = readFile.keys
 

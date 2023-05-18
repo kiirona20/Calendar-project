@@ -35,10 +35,10 @@ object Main extends App {
 
 
 
-  val testEvent = "20230512160000,20230513190000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT2,20230512110000"
-  val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512120000"
-  val testEvent3 = "20230512140000,20230512160000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512130000"
-  val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, CONFERENCE, JOTAINTJOIANT,20230512140000"
+  val testEvent = "20230512160000,20230513190000, hopefully this works :(, kiva, CONFERENCE,20230512110000"
+  val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, mörkö, CONFERENCE,20230512120000"
+  val testEvent3 = "20230512140000,20230512160000, hopefully this works :(, kokki, CONFERENCE,20230512130000"
+  val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, emt, CONFERENCE,  "
 
 
 
@@ -61,7 +61,7 @@ object Main extends App {
     Events.deleteEvent("20230512150000")
 @main
   def testEdit =
-    Events.editEvent("20230512160000", ("CONFERENCE", "jotain1"))
+    Events.editEvent("20230515101010", ("None", "jotain1"))
 @main
   def testdateformat =
     println(Events.getdayOfWeek("202303031700")) // Friday
@@ -71,11 +71,12 @@ object Main extends App {
     println(Events.getHour("202303031700"))
 @main
   def testgetInfo =
-    println(Events.getEventName("20230512112000"))
-    println(Events.getEventDescription("20230512112000"))
-    println(Events.getEventEndTime("20230512112000"))
-    println(Events.getMin("20230512154000"))
-    println(Events.getTime("20230512154000").toString)
+    println(Events.getEventName("20230513110000"))
+    println(Events.getEventDescription("20230513110000"))
+    println(Events.getEventEndTime("20230513110000"))
+
+    println(Events.getMin("20230513110000"))
+    println(Events.getTime("20230513110000").toString)
 
 
 
