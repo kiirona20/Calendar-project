@@ -249,7 +249,8 @@ object Events {
     LocalDateTime.parse(date,dateFormat).toLocalDate
 
   def getDateToday = LocalDate.now()
-
+  
+ 
 
 
 
