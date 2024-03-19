@@ -1,6 +1,6 @@
 
 
-import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter}
+import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter, StreamCorruptedException}
 import java.time.{LocalDateTime, LocalTime}
 import java.util.UUID
 import scala.{:+, ::}
@@ -85,13 +85,76 @@ object Events {
 
 
 
+  //Match case format parempi :DDD Refraktoroi match case tavaksi
+
+  def iCalderFormatBetter(linesToEdit: Seq[String]): Map[String, Seq[String]] =
+    ???
+
+
   // Reads the whole file and stores the data into a Map.
   // This map can be used to process the data elsewhere.
+
+
+  //readFile voidaan refraktoroida paremmaksi tekemällä match case tilanne
+  def readFileBetter: String =
+    var storedEvents = ""
+
+    val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
+
+      catch
+        case e: FileNotFoundException => return storedEvents
+        case e: IOException => return storedEvents
+    //Testing different required parts of
+    var vcalendar = false
+    var startDateTime = false
+    var endDateTime = false
+
+    try
+      var currentLine = lineReader.readLine().trim.toLowerCase
+
+      if !((currentLine.startsWith("begin:vcalendar"))) then
+        throw new StreamCorruptedException("File format not recognised")
+
+      currentLine = lineReader.readLine()
+      while currentLine != null do
+        currentLine = currentLine.trim.toLowerCase
+        var sisalto = currentLine
+        currentLine = currentLine match
+          case sisalto if sisalto.startsWith("begin:vevent") => storedEvents += "begin vevent detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("uid:") => storedEvents += "UID detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("dtstart:") => storedEvents += "dtstart detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("dtend:") => storedEvents += "dtend detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("summary:") => storedEvents += "summary detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("description:") => storedEvents += "description detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("categories:") => storedEvents += "categories detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("trigger:") => storedEvents += "trigger detected"
+            storedEvents
+          case sisalto if sisalto.startsWith("end:vevent") => storedEvents += "Laita asiat pakettiin"
+            storedEvents
+          case _ => lineReader.readLine()
+
+    storedEvents
+
+  //def readFileHelper(input: BufferedReader) =
+    //input.readLine() match
+      //case null => null
+      //case
+
+
+
+
 
   def readFile: Map[String,Seq[String]] =
     var storedEvents = Map[String,Seq[String]]()
     var mapKey: String = ""
-    val lineReader = try BufferedReader(FileReader("eventInfo.ics"))
+    val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
 
       catch
         case e: FileNotFoundException => return storedEvents

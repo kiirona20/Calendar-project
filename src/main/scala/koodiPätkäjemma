@@ -1,0 +1,15 @@
+          
+          
+          Salee auttaa userInput Juttuihin
+          /**
+          if result.isDefined then
+            userInput(nameInput.getText,
+            if (startDateInput.getValue != null) startDateInput.getValue.toString else "",
+            startTimeInput.getText,
+            if (endDateInput.getValue != null) endDateInput.getValue.toString else "",
+            endTimeInput.getText,
+            descriptionInput.getText,
+            if (alarmdateInput.getValue != null) alarmdateInput.getValue.toString else "",
+            alarmtimeInput.getText,
+            categoryInput.getSelectionModel.getSelectedItem)
+          */

@@ -47,6 +47,10 @@ object Main extends App {
   //def testWriting =
     //Events.writetoFile(Events.iCalendarFormat(List("4d5ca2fe-5b81-45a5-afb0-66cb28f39373", "name", "20230512T150000z", "20230512T200000z",  "hopefully this works :D")))
 @main
+  def testReadingBetter = println(Events.readFileBetter)
+
+
+@main
   def testReading = println(Events.readFile)
 
 @main
@@ -55,6 +59,7 @@ object Main extends App {
 @main
   def testIcalendar =
     println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
+    Events.iCalderFormatBetter(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b))
 
 @main
   def testDelete =

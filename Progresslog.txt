@@ -2,23 +2,11 @@
 Nothing has been done during these 2 weeks.
 
 
-20.3
-Events Class has been added. Implemented data structure. Add, delete and edit functions implemented.
-Implemented a way to read and write Calendar data to the eventInfo file.
+19.3
+Refractored some code -> made a seperate class for dialogs to make code more
+readable. Started to refractor the whole Events class.
+The project is roughly at the phase as planned.
+Until the next meeting, goal is to have all the basic and easy functionalities
+implemented.
 
-I found hard to find a way to append, delete and edit data from a file. Specifically
-preserving the already exisinting data and only modifying the data that is needed to modify.
 
-Workload was about 15 hours.
-
-The project is approx 2 weeks behind from schedule.
-
-3.4
-Fixed editEvent function. Starting to work on the interface. The project has not been progressing
-as intended because I have not been prioritizing this project over other school work. 
-
-I find it hard to start working on the interface since it requires a lot of background research.
-
-Workload was about 1 hour
-
-The project is approx 4 weeks behind from schedule. 

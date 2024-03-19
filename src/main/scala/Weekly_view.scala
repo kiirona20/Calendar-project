@@ -26,7 +26,6 @@ import scalafx.scene.control.Alert.AlertType
 
 import scala.concurrent.duration.*
 import java.time.{Duration, LocalDateTime}
-import java.time.format.DateTimeFormatter
 
 object Weekly_view extends JFXApp3:
   // Define a case class to represent a reminder
@@ -90,7 +89,7 @@ object Weekly_view extends JFXApp3:
 
 
         //add labels for each day of the week
-        for i <- 0until(days.length) do
+        for i <- days.indices do
           val label = new Label(days(i))
           gridpane.add(label,i+1,0)
 
@@ -240,29 +239,6 @@ object Weekly_view extends JFXApp3:
 
         root = gridpane
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // Function to display a dialog for adding a new event
         def EventInputDialog(): Unit =
           // Create a new dialog for adding events
@@ -409,7 +385,7 @@ object Weekly_view extends JFXApp3:
 
 
         val contextmenu = new ContextMenu()
-        contextmenu.items.add((new MenuItem("Add"){onAction = () => EventInputDialog()}))
+        contextmenu.items.add((new MenuItem("Add"){onAction = () => Dialogs.EventInputDialog()}))
         contextmenu.items.add((new MenuItem("Edit"){onAction = () => editEventDialog}))
         contextmenu.items.add((new MenuItem("Delete"){onAction = () => deleteDialog}))
         contextmenu.items.add(new MenuItem("Categories"){onAction = () => categoriesDialog})
@@ -552,15 +528,6 @@ object Weekly_view extends JFXApp3:
           }
 
 
-
-        def showWarningPopup(message: String): Unit =
-          val alert = new Alert(AlertType.Warning)
-          alert.title = "Warning Dialog"
-          alert.headerText = "Task Alert"
-          alert.contentText = message
-
-          alert.showAndWait()
-
         def editEventDialog: Unit =
           val dialog = new Dialog[Unit]()
           dialog.setTitle("Edit event")
@@ -569,8 +536,6 @@ object Weekly_view extends JFXApp3:
           val listView = new ListView(Events.showEvents.toList)
           listView.prefHeight = 200
           listView.prefWidth = 200
-
-
           val grid = new GridPane()
           grid.add(listView,1,1)
           dialog.getDialogPane.setContent(grid)
