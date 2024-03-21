@@ -1,11 +1,10 @@
-import Main.userInput
 
 import scala.io.StdIn.*
 
 object Main extends App {
     //Should work with this input = name,202003031700,202003031800, hopefully this works :D
 
-  println("Choose to add an event, edit event or delete an event")
+ /** println("Choose to add an event, edit event or delete an event")
   var userInput = readLine()
 
   if userInput.toLowerCase == "add" then
@@ -32,7 +31,7 @@ object Main extends App {
     println(Events.readFile)}
 
 
-
+*/
 
 
   val testEvent = "20230512160000,20230513190000, hopefully this works :(, kiva, CONFERENCE,20230512110000"
@@ -40,6 +39,9 @@ object Main extends App {
   val testEvent3 = "20230512140000,20230512160000, hopefully this works :(, kokki, CONFERENCE,20230512130000"
   val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, emt, CONFERENCE,  "
 
+  val event12 = Event( "jotain1", "20240322160000","20240322190000", Some("äiti"), Some("isä"), Some("tapaaminen"), Some("20240322150000"))
+  val event13 = Event( "jotain2", "20240323160000","20240323190000", None, None, None, None)
+  val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("äiti"), Some("isä"), Some("tapaaminen"), Some("20240322150000"))
 
 
 
@@ -51,22 +53,23 @@ object Main extends App {
 
 
 @main
-  def testReading = println(Events.readFile)
+  def testEditBetter =
+    Events.editEventBetter("20240323160000","description",Some("lol"))
+
+
 
 @main
-  def testAdding = Events.addEvent(testEvent4) // start time should be unique
+  def testAdding = Events.addEventBetter(event14)// start time should be unique
 
 @main
   def testIcalendar =
-    println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
-    Events.iCalderFormatBetter(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b))
+    //println(Events.iCalendarFormat(Events.readFile.map((i)=>i._2).reduce((a,b)=>a++b)))
+    println(Events.iCalderFormatBetter(Events.readFileBetter.values.toSeq))
 
 @main
   def testDelete =
-    Events.deleteEvent("20230512150000")
-@main
-  def testEdit =
-    Events.editEvent("20230515101010", ("None", "jotain1"))
+    Events.deleteEvent("20240323160000")
+
 @main
   def testdateformat =
     println(Events.getdayOfWeek("202303031700")) // Friday
@@ -76,14 +79,14 @@ object Main extends App {
     println(Events.getHour("202303031700"))
 @main
   def testgetInfo =
-    //println(Events.getEventName("20230513110000"))
-    //println(Events.getEventDescription("20230513110000"))
-    //println(Events.getEventEndTime("20230513110000"))
+    println(Events.getEventName("20230513110000"))
+    println(Events.getEventDescription("20230513110000"))
+    println(Events.getEventEndTime("20230513110000"))
 
     println(Events.getMin("20230513110000"))
     println(Events.getTime("20230513110000").toString)
     println(Events.groupedByCategories)
-    println(Events.allCategories)
+    println(Events.allCategories)}
 
 
 

@@ -1,4 +1,3 @@
-import Main.userInput
 import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx}
 import scalafx.beans.property.BooleanProperty
 

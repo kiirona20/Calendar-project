@@ -242,7 +242,7 @@ object Weekly_view extends JFXApp3:
         // Function to display a dialog for adding a new event
         def EventInputDialog(): Unit =
           // Create a new dialog for adding events
-          val dialog = new Dialog[(String, String, String, String, String, String, String, String, String)]()
+          val dialog = new Dialog[( String, String, String, String, String, String, String, String)]()
           dialog.setTitle("Add Event")
           dialog.setHeaderText("Enter event details")
 
@@ -279,7 +279,7 @@ object Weekly_view extends JFXApp3:
           val descriptionInput = new TextField()
 
           val categoryLabel = new Label("Category:")
-          val categoryInput = new ComboBox[String](FXCollections.observableArrayList(AppState.allCategories: _*))
+          //val categoryInput = new ComboBox[String](FXCollections.observableArrayList(AppState.allCategories: _*))
 
           // Create input fields for alarm date and time
           val alarmdateLabel = new Label("Alarm date")
@@ -309,7 +309,7 @@ object Weekly_view extends JFXApp3:
           grid.add(descriptionInput, 2, 6)
 
           grid.add(categoryLabel,1,7)
-          grid.add(categoryInput,2,7)
+          //grid.add(categoryInput,2,7)
 
           grid.add(alarmdateLabel,1,8)
           grid.add(alarmdateInput,2,8)
@@ -338,8 +338,8 @@ object Weekly_view extends JFXApp3:
               endTimeInput.getText,
               descriptionInput.getText,
               if alarmdateInput.getValue != null then alarmdateInput.getValue.toString else "",
-              alarmtimeInput.getText,
-              categoryInput.getSelectionModel.getSelectedItem)
+              alarmtimeInput.getText)
+              //categoryInput.getSelectionModel.getSelectedItem)
             else
               null
 
@@ -353,13 +353,14 @@ object Weekly_view extends JFXApp3:
             endTimeInput.getText,
             descriptionInput.getText,
             if (alarmdateInput.getValue != null) alarmdateInput.getValue.toString else "",
-            alarmtimeInput.getText,
-            categoryInput.getSelectionModel.getSelectedItem)
+            alarmtimeInput.getText)
+            //categoryInput.getSelectionModel.getSelectedItem)
 
           val eventName = nameInput.getText
 
            //Should work with this input = name,202003031700,202003031800, hopefully this works :D
-        def userInput(name: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, alarmDate: String, alarmTime: String, category: String) =
+        def userInput(name: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, alarmDate: String, alarmTime: String) =
+          val category = None
           val stDate: String = dateStart.replace("-", "")
           val stTime: String = timeStart.replace(":", "")
           val stDateTime = stDate+stTime
@@ -370,9 +371,9 @@ object Weekly_view extends JFXApp3:
           val alarTime = if alarmTime != "" then alarmTime.replace(":","") else ""
 
           val alarmDateTIme = if alarDate != "" && alarTime != "" then alarDate + alarTime else ""
-          val categ = if category != "" then category else "None"
+
           //categ, alarmdatetime are optional
-          Events.addEvent(stDateTime + "," + endDateTime + "," + name + "," + description + "," + categ + "," + alarmDateTIme)
+          Events.addEventBetter(Event(stDateTime, endDateTime, name, Some(description), None, Some(alarmDateTIme)))
           deleteEventsFromGrid
           Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
           if(alarmDateTIme != ""){
@@ -388,13 +389,13 @@ object Weekly_view extends JFXApp3:
         contextmenu.items.add((new MenuItem("Add"){onAction = () => Dialogs.EventInputDialog()}))
         contextmenu.items.add((new MenuItem("Edit"){onAction = () => editEventDialog}))
         contextmenu.items.add((new MenuItem("Delete"){onAction = () => deleteDialog}))
-        contextmenu.items.add(new MenuItem("Categories"){onAction = () => categoriesDialog})
-        contextmenu.items.add(new MenuItem("add Categirues"){onAction = () => addCategoryDialog})
+        //contextmenu.items.add(new MenuItem("Categories"){onAction = () => categoriesDialog})
+        //contextmenu.items.add(new MenuItem("add Categirues"){onAction = () => addCategoryDialog})
 
 
 
 
-        def categoriesDialog: Unit =
+       /** def categoriesDialog: Unit =
           val dialog = new Dialog[Unit]()
           dialog.setTitle("Categories")
           dialog.setHeaderText("Here you can edit categories and view events by categories.")
@@ -405,8 +406,8 @@ object Weekly_view extends JFXApp3:
 
           // Create checkboxes for all categories
           val checkboxes = allCategories.map { category =>
-            val checkbox = new CheckBox(category)
-            checkbox.selected = AppState.selectedCategories.contains(category)
+            val checkbox = new CheckBox(category.get)
+            //checkbox.selected = AppState.selectedCategories.contains(category)
             checkbox
           }
 
@@ -428,7 +429,7 @@ object Weekly_view extends JFXApp3:
             if (selectedCategory != null) {
               AppState.deleteCategory(selectedCategory)
 
-              Events.groupedByCategories(selectedCategory).foreach((i)=>Events.deleteEvent(i._1))
+              Events.groupedByCategories(Some(selectedCategory)).foreach((i)=>Events.deleteEvent(i._1))
               Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))            }
           })
 
@@ -453,13 +454,13 @@ object Weekly_view extends JFXApp3:
             val eventsGroupedByCategories = Events.groupedByCategories
             deleteEventsFromGrid
             AppState.selectedCategories.foreach { category =>
-                eventsGroupedByCategories(category).foreach(i => setEventstoGrid(i._1, Events.getEventEndTime(i._1)))
+                eventsGroupedByCategories(Some(category)).foreach(i => setEventstoGrid(i._1, Events.getEventEndTime(i._1)))
             }
 
         onMouseClicked = (me: MouseEvent) =>
           if me.button == MouseButton.Secondary then
             contextmenu.show(this.window(),me.screenX,me.screenY)
-
+*/
         def deleteDialog: Unit =
           val dialog = new Dialog[Unit]()
           dialog.setTitle("Delete event")
@@ -489,7 +490,7 @@ object Weekly_view extends JFXApp3:
           dialog.showAndWait()
         // an object that keeps track of App state. By default every Category is selected.
         private val basiccategories = List[String]("Study","Hobbies", "Work")
-        object AppState {
+       /** object AppState {
           var allCategories: List[String] = Events.allCategories.toList ++ basiccategories
           var selectedCategories: List[String] = allCategories
 
@@ -497,8 +498,8 @@ object Weekly_view extends JFXApp3:
             allCategories = allCategories.filterNot(_ == category)
             selectedCategories = selectedCategories.filterNot(_ == category)
         }
-
-        def addCategoryDialog: Unit =
+        */
+        /**def addCategoryDialog: Unit =
           val dialog = new Dialog[String]()
           dialog.setTitle("New Category")
           dialog.setHeaderText("Enter new category details.")
@@ -527,7 +528,7 @@ object Weekly_view extends JFXApp3:
             AppState.allCategories = category.toString :: AppState.allCategories
           }
 
-
+      */
         def editEventDialog: Unit =
           val dialog = new Dialog[Unit]()
           dialog.setTitle("Edit event")
@@ -626,10 +627,10 @@ object Weekly_view extends JFXApp3:
             val newEndDate = endDateInput.getValue.toString.replace("-","") + endTimeInput.getText.replace(":","")
             val newDescription = if descriptionInput.text != null then descriptionInput.getText else oldDescription
 
-            Events.editEvent(key,(oldStartDate,newStartDate))
-            Events.editEvent(key,(oldEndDate,newEndDate))
-            Events.editEvent(key,(oldDescription,newDescription))
-            Events.editEvent(key,(oldName,newName))
+            Events.editEventBetter(key,"startTime",Some(newStartDate))
+            Events.editEventBetter(key,"endTime" ,Some(newEndDate))
+            Events.editEventBetter(key,"description",Some(newDescription))
+            Events.editEventBetter(key,"summary",Some(newName))
             deleteEventsFromGrid
             Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
             dialog.close()

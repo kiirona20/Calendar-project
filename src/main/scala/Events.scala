@@ -12,16 +12,12 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object Events {
-
   // Writes user inputs to a txt file in a correct format.
-
-
   def writetoFile(linesToWrite: Map[String, Seq[String]]):  Unit =
-    val fileIn = FileWriter("eventInfo.ics") // set to true so the writing will append to a file
+    val fileIn = FileWriter("icalendarformat.txt") // set to true so the writing will append to a file
     var lineWriter = BufferedWriter(fileIn)
 
     try
-      lineWriter.newLine()
       //After that we gonna write the linesToWrite part
       linesToWrite.foreach((key)=>key._2.foreach(lineWriter.write(_)))
 
@@ -36,59 +32,35 @@ object Events {
   //resultVcalendar is in ICS format. these indexes will be modified by program.
   //IcalendarFormat converts given Seq[String] to the correct format so it can be written to the file
 
-  def checkAlarm(alarm: String) =
-    try
-      LocalDateTime.parse(alarm,dateFormat)
-      true
-    catch
-      case ex: Exception => false
 
-  //def checkToPad(lines: Seq[String]) =
-    //val remainder = lines.length % 7
-    //val padLength = if remainder != 0 then 7 - remainder else 0
-    //val paddedLinesToEdit = lines.padTo(lines.length + padLength, "")
-    //paddedLinesToEdit
 
-  def iCalendarFormat(linestoedit: Seq[String]): Map[String, Seq[String]] =
+
+  //Match case format parempi :DDD Refraktoroi match case tavaksi
+
+  def iCalderFormatBetter(linestoedit: Seq[Event]): Map[String, Seq[String]] =
     //randomUUID creates random UUID for the Ics format
     //Date is the key :D
     //Date should be located at index 1
     var empty = Map[String,Seq[String]]()
 
     // Checks if the linestoEdit is not empty
-    var i = 0
+    for i <- linestoedit.indices do
 
-    val remainder = linestoedit.length % 7
-    val padLength = if remainder != 0 then 7 - remainder else 0
-    val paddedLinesToEdit = linestoedit.padTo(linestoedit.length + padLength, "")
-    //println(paddedLinesToEdit.length)
-
-    if linestoedit.size > 0 then
-      while i < paddedLinesToEdit.length do
-        val alarm = if checkAlarm(paddedLinesToEdit(i+6)) then "BEGIN:VALARM\nACTION:AUDIO\n" +
-          "TRIGGER:" + paddedLinesToEdit(i+6).patch(8,"T",0)  + "z\n"+ "END:VALARM\n" else ""
-        empty = empty ++ (Map[String,Seq[String]](linestoedit(i+1)-> Seq[String](
-        "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\nBEGIN:VEVENT\n",
-        "UID:" + paddedLinesToEdit(i)+"\n",
-        "DTSTAMP:" + LocalDateTime.now().toString.replace("-","").replace(":","").takeWhile((i)=>i != '.') + "z\n",
-        "DTSTART:" + paddedLinesToEdit(i+1).patch(8,"T",0) + "z\n",
-        "DTEND:" + paddedLinesToEdit(i+2).patch(8,"T",0) + "z\n",
-        "SUMMARY:" + paddedLinesToEdit(i+3) + "\n",
-        "DESCRIPTION:" + paddedLinesToEdit(i+4) + "\n",
-        if paddedLinesToEdit(i+5) == "" then "" else "CATEGORIES:" + paddedLinesToEdit(i+5) + "\n",
-         alarm,
-        "END:VEVENT\n\nEND:VCALENDAR\n\n")))
-        i += 7
-      empty
-    else
-      empty
+      empty =  empty ++ Map(linestoedit(i).startTime -> Seq[String](
+       if i == 0 then "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\n" else "",
+      "BEGIN:VEVENT\nUID:" + linestoedit(i).uid+"\n",
+      "DTSTART:" + linestoedit(i).startTime.patch(8,"T",0) + "\n",
+      "DTEND:" + linestoedit(i).endTime.patch(8,"T",0) + "\n",
+      linestoedit(i).summary.map((j)=>"SUMMARY:" + j + "\n").getOrElse(""),
+      linestoedit(i).description.map((j)=>"DESCRIPTION:" + j + "\n").getOrElse(""),
+      linestoedit(i).categories.map((j)=>"CATEGORIES:" + j + "\n").getOrElse(""),
+      linestoedit(i).trigger.map((j)=>"BEGIN:VALARM\nACTION:AUDIO\nTRIGGER:" + j.patch(8,"T",0) + "\nEND:VALARM\n").getOrElse(""),
+      "END:VEVENT\n",
+      if i+1 == linestoedit.length then "END:VCALENDAR" else ""
+  ))
+    empty
 
 
-
-  //Match case format parempi :DDD Refraktoroi match case tavaksi
-
-  def iCalderFormatBetter(linesToEdit: Seq[String]): Map[String, Seq[String]] =
-    ???
 
 
   // Reads the whole file and stores the data into a Map.
@@ -96,202 +68,139 @@ object Events {
 
 
   //readFile voidaan refraktoroida paremmaksi tekemällä match case tilanne
-  def readFileBetter: String =
-    var storedEvents = ""
+  def readFileBetter: Map[String,Event] =
+    var storedData = ""
+    var storedEventsBetter: Map[String,Event] = Map()
 
     val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
 
       catch
-        case e: FileNotFoundException => return storedEvents
-        case e: IOException => return storedEvents
+        case e: FileNotFoundException => return storedEventsBetter
+        case e: IOException => return storedEventsBetter
     //Testing different required parts of
     var vcalendar = false
+    var beginV = false
+    var hasUId = false
     var startDateTime = false
     var endDateTime = false
+    var endV = false
+
+    var baseEvent = new Event
+
 
     try
-      var currentLine = lineReader.readLine().trim.toLowerCase
-
-      if !((currentLine.startsWith("begin:vcalendar"))) then
-        throw new StreamCorruptedException("File format not recognised")
+      var currentLine = lineReader.readLine()
+      if currentLine == null then return storedEventsBetter
 
       currentLine = lineReader.readLine()
       while currentLine != null do
-        currentLine = currentLine.trim.toLowerCase
+        currentLine = currentLine
         var sisalto = currentLine
+
         currentLine = currentLine match
-          case sisalto if sisalto.startsWith("begin:vevent") => storedEvents += "begin vevent detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("uid:") => storedEvents += "UID detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("dtstart:") => storedEvents += "dtstart detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("dtend:") => storedEvents += "dtend detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("summary:") => storedEvents += "summary detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("description:") => storedEvents += "description detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("categories:") => storedEvents += "categories detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("trigger:") => storedEvents += "trigger detected"
-            storedEvents
-          case sisalto if sisalto.startsWith("end:vevent") => storedEvents += "Laita asiat pakettiin"
-            storedEvents
+          case sisalto if sisalto.startsWith("BEGIN:VEVENT") =>
+            beginV = true
+            //reset event
+            baseEvent = new Event
+            lineReader.readLine()
+
+          case sisalto if sisalto.startsWith("UID:") =>
+            hasUId = true
+            baseEvent.uid = (currentLine.slice(4, 40))
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("DTSTART") =>
+            startDateTime = true
+            baseEvent.startTime = currentLine.slice(8,16) + currentLine.slice(17,23)
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("DTEND:") => storedData += "dtend detected"
+            endDateTime = true
+            baseEvent.endTime = currentLine.slice(6,14) + currentLine.slice(15,21)
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("SUMMARY:") => storedData += "summary detected"
+            baseEvent.summary = Some(currentLine.drop(8))
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("DESCRIPTION:") => storedData += "description detected"
+            baseEvent.description = Some(currentLine.drop(12))
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("CATEGORIES:") => storedData += "categories detected"
+            baseEvent.categories = (Some(currentLine.drop(11)))
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("TRIGGER:") => storedData += "trigger detected"
+            baseEvent.trigger = (Some(currentLine.slice(8,16) + currentLine.slice(17,23)))
+            lineReader.readLine()
+          case sisalto if sisalto.startsWith("END:VEVENT") => storedData += "Laita asiat pakettiin"
+            endV = true
+            lineReader.readLine()
           case _ => lineReader.readLine()
-
-    storedEvents
-
-  //def readFileHelper(input: BufferedReader) =
-    //input.readLine() match
-      //case null => null
-      //case
-
-
-
-
-
-  def readFile: Map[String,Seq[String]] =
-    var storedEvents = Map[String,Seq[String]]()
-    var mapKey: String = ""
-    val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
-
-      catch
-        case e: FileNotFoundException => return storedEvents
-        case e: IOException => return storedEvents
-
-    var oneline: String = lineReader.readLine()
-    var mapData =  (Seq[String](),Seq[Int]())
-    oneline = lineReader.readLine()
-    while oneline != null do
-      //start new map data for new event
-      if oneline.contains("BEGIN:VEVENT") then
-          mapData = (Seq[String](),Seq[Int]())
-
-      if oneline.contains("UID:") then
-        //adds UID
-        val data = (oneline.slice(4, 40),1)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-     // if oneline.contains("DTSTAMP:") then
-          // adds DTSTAMP
-       // val data = (oneline.slice(8,16) + oneline.slice(17,23),2)
-       // mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("DTSTART:") then
-        // adds DTStart format: Dropping( DASTART:) taking (8 char Year/month/day) dropping 1 char and taking (6 char, Hour/min/seconds)
-        val data = (oneline.slice(8,16) + oneline.slice(17,23),2)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-        mapKey = oneline.slice(8,16) + oneline.slice(17,23)
-      if oneline.contains("DTEND:") then
-        // adds DTSEND Format
-        val data = (oneline.slice(6,14) + oneline.slice(15,21),3)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("SUMMARY:") then
-        //adds Summary
-        val data = (oneline.drop(8),4)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("DESCRIPTION:") then
-        val data = (oneline.drop(12),5)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("CATEGORIES:") then
-        val data = (oneline.drop(11),6)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-
-      if oneline.contains("TRIGGER:") then
-        val data = (oneline.slice(8,16) + oneline.slice(17,23),7)
-        mapData = (mapData._1 :+ data._1, mapData._2 :+ data._2)
-      if oneline.contains("END:VEVENT") then
-      // adds mapData to storedEvents for the current event when the event ends
-        storedEvents = storedEvents + (mapKey->mapData._1.zip(mapData._2).sortBy(_._2).map(_._1))
-
-
-      oneline = lineReader.readLine()
-    //zipping seq[String] and Seq[Int] and the sorting them by Int
-    //storedEvents will always have the same order, so it will be easier to manipulate data afterwards.
-    storedEvents
+        //If there is all the essential data for creating event the event is stored in a Map
+        if beginV && startDateTime && hasUId && endDateTime && endV then
+          storedEventsBetter += baseEvent.startTime -> baseEvent
+          beginV = false
+          hasUId = false
+          startDateTime = false
+          endDateTime = false
+          endV = false
 
 
 
 
-  def addEvent(userInput: String) =
-    // Generates new UID
-    val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
-    val userInputToSeq: Seq[String] = (generateNewUid ++ userInput).split(",").toSeq
-    val formattedUserInput = iCalendarFormat(userInputToSeq)
+    storedEventsBetter
 
-    val existingEvents = readFile
-
-    //format all existing events
-    val formattedExistingEvents = existingEvents.flatMap((i)=>iCalendarFormat(i._2))
-
-
-    //add new event to existing events
-    val updatedEvents = formattedExistingEvents ++ (formattedUserInput)
-
-    writetoFile(updatedEvents)
+  //toimii kai
+  def addEventBetter(userInput: Event): Unit =
+    val existingEvents = readFileBetter
+    val updatedEvents = existingEvents.values.toSeq :+ userInput
+    val formattedEvents = iCalderFormatBetter(updatedEvents)
+    println(formattedEvents)
+    writetoFile(formattedEvents)
 
 
-
-
-
-
-
-  def showEventDetails(userInput: String) = readFile(userInput)
+  //laita näyttää kaikki eventit
+  def showEventDetails(userInput: String) = readFileBetter(userInput)
 
 // Tarkoitus: Etsi rivi tiedostosta ja muokkaa sitä. Esim käyttäjä syöttää tapahtuman nimen ja mitä hän haluaa muokata. editEvent etsii rivin tiedostosta ja kirjoittaa tämän rivin uudestaan.
-
-
-
-  def editEvent(userInput:String ,whatToEdit: (String, String)): Unit =
-    var listOfEvents = readFile
-    if !listOfEvents.contains(userInput) then
+//KEY IS STARTINGDATEANDTIME
+//toimii kai
+  def editEventBetter(key: String, edit: String, toWhat: Option[String]): Unit =
+    val listOfEvents = readFileBetter
+    if !listOfEvents.contains(key) then
       println("Event not found!")
       return
-
-    var index = listOfEvents(userInput).indexWhere(_.contains(whatToEdit._1))
-    if (index == -1) then
-      println(s"Attribute '${whatToEdit._1}' not found in the event.")
-      return
-
-    val updatedList = listOfEvents(userInput).updated(index, whatToEdit._2)
-
-    listOfEvents = listOfEvents.updated(userInput, updatedList)
-
-    val formattedExistingEvents = listOfEvents.flatMap((i)=>iCalendarFormat(i._2))
-
-
-    writetoFile(formattedExistingEvents)
-
-
+    val event = listOfEvents(key)
+    event.findAndEdit(edit,toWhat)
+    writetoFile(iCalderFormatBetter(listOfEvents.values.toSeq))
 
 // Tarkoitus : Talenna jokainen rivi muuttujaan, jos rivit eivät sisällä event to deletee, niin kirjoita nämä rivit uudestaan tiedostoon.
 
 // implement method when maptowrite size is
-  def deleteEvent(userInput: String) =
-    if readFile.size > 1 then
-      val updatedMap = readFile - userInput
-      writetoFile(updatedMap.flatMap((i)=>iCalendarFormat(i._2)))
+  def deleteEvent(key: String): Unit =
+    if readFileBetter.size > 1 then
+      val updatedMap = readFileBetter - key
+      println(updatedMap)
+      writetoFile(iCalderFormatBetter(updatedMap.values.toSeq))
     else
       writetoFile(Map.empty[String, Seq[String]])
 
-  def getEventName(key: String) =
-    readFile(key)(3)
+  def getEventName(key: String): String =
+    readFileBetter(key).summary.getOrElse("Event has no name")
 
-  def getEventEndTime(key: String) =
-    readFile(key)(2)
-  def getEventDescription(key: String) =
-    readFile(key)(4)
+  def getEventEndTime(key: String): String =
+    readFileBetter(key).startTime
+  def getEventDescription(key: String): String =
+    readFileBetter(key).description.getOrElse("Event has no description")
   // 0 = UID 1 = start time 2 = end time 3 = summary  4 = description 5 = categories 6 = alarm
   def getCategorie(key: String) =
-    readFile(key)(5)
+    readFileBetter(key).categories.getOrElse("Event has no category")
+
 
   def groupedByCategories =
-    readFile.groupBy((i)=>i._2(5))
+    readFileBetter.groupBy((i)=>i._2.categories)
 
   def allCategories =
     groupedByCategories.keys
     
 
-  def showEvents = readFile.keys
+  def showEvents = readFileBetter.keys
 
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
