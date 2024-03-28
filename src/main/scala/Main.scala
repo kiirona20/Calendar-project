@@ -1,4 +1,6 @@
 
+import Events.groupedByCategories
+
 import scala.io.StdIn.*
 
 object Main extends App {
@@ -42,7 +44,7 @@ object Main extends App {
   val event12 = Event( "jotain1", "20240322160000","20240322190000", Some("äiti"), Some("isä"), Some("tapaaminen"), Some("20240322150000"))
   val event13 = Event( "jotain2", "20240323160000","20240323190000", None, None, None, None)
   val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("äiti"), Some("isä"), Some("tapaaminen"), Some("20240322150000"))
-
+  val testFilter = Seq("tapaaminen")
 
 
 //@main
@@ -55,6 +57,14 @@ object Main extends App {
 @main
   def testEditBetter =
     Events.editEventBetter("20240323160000","description",Some("lol"))
+
+@main
+  def showEvents =
+    println(Events.showEvents)
+    calendarState.appliedFilters(testFilter)
+    println(calendarState.appliedFilter)
+    println(Events.groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys))
+    println(Events.showEvents)
 
 
 
@@ -69,22 +79,33 @@ object Main extends App {
 @main
   def testDelete =
     Events.deleteEvent("20240323160000")
+@main
+  def converDAte =
+    println(Events.convertDate("20240324190000"))
 
 @main
   def testdateformat =
-    println(Events.getdayOfWeek("202303031700")) // Friday
+    println(Events.getdayOfWeek("20230303170000")) // Friday
 
 @main
   def testtimeformat =
-    println(Events.getHour("202303031700"))
+    println(Events.getHour("20230303170000"))
+@main
+  def testCategories =
+    println(Events.allCategories)
+    println(Events.groupedByCategories)
+
+@main
+  def testGetTime =
+    println(Events.getTime("20240324190000"))
 @main
   def testgetInfo =
-    println(Events.getEventName("20230513110000"))
-    println(Events.getEventDescription("20230513110000"))
-    println(Events.getEventEndTime("20230513110000"))
+    println(Events.getEventName("20240322160000"))
+    println(Events.getEventDescription("20240322160000"))
+    println(Events.getEventEndTime("20240322160000"))
 
-    println(Events.getMin("20230513110000"))
-    println(Events.getTime("20230513110000").toString)
+    println(Events.getMin("20240322160000"))
+    println(Events.getTime("20240322160000").toString)
     println(Events.groupedByCategories)
     println(Events.allCategories)}
 

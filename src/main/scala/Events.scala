@@ -151,14 +151,11 @@ object Events {
     val existingEvents = readFileBetter
     val updatedEvents = existingEvents.values.toSeq :+ userInput
     val formattedEvents = iCalderFormatBetter(updatedEvents)
-    println(formattedEvents)
     writetoFile(formattedEvents)
 
 
-  //laita näyttää kaikki eventit
   def showEventDetails(userInput: String) = readFileBetter(userInput)
 
-// Tarkoitus: Etsi rivi tiedostosta ja muokkaa sitä. Esim käyttäjä syöttää tapahtuman nimen ja mitä hän haluaa muokata. editEvent etsii rivin tiedostosta ja kirjoittaa tämän rivin uudestaan.
 //KEY IS STARTINGDATEANDTIME
 //toimii kai
   def editEventBetter(key: String, edit: String, toWhat: Option[String]): Unit =
@@ -170,13 +167,11 @@ object Events {
     event.findAndEdit(edit,toWhat)
     writetoFile(iCalderFormatBetter(listOfEvents.values.toSeq))
 
-// Tarkoitus : Talenna jokainen rivi muuttujaan, jos rivit eivät sisällä event to deletee, niin kirjoita nämä rivit uudestaan tiedostoon.
 
 // implement method when maptowrite size is
   def deleteEvent(key: String): Unit =
     if readFileBetter.size > 1 then
       val updatedMap = readFileBetter - key
-      println(updatedMap)
       writetoFile(iCalderFormatBetter(updatedMap.values.toSeq))
     else
       writetoFile(Map.empty[String, Seq[String]])
@@ -185,7 +180,7 @@ object Events {
     readFileBetter(key).summary.getOrElse("Event has no name")
 
   def getEventEndTime(key: String): String =
-    readFileBetter(key).startTime
+    readFileBetter(key).endTime
   def getEventDescription(key: String): String =
     readFileBetter(key).description.getOrElse("Event has no description")
   // 0 = UID 1 = start time 2 = end time 3 = summary  4 = description 5 = categories 6 = alarm
@@ -194,31 +189,34 @@ object Events {
 
 
   def groupedByCategories =
-    readFileBetter.groupBy((i)=>i._2.categories)
-
+    readFileBetter.groupBy((i)=>i._2.categories).filter((i)=>i._1.isDefined)
+  //Filters all the None categories
   def allCategories =
     groupedByCategories.keys
     
 
-  def showEvents = readFileBetter.keys
+  def showEvents =
+    if calendarState.appliedFilter.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys)
+    else
+      readFileBetter.keys
 
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
+  private val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
 
   def getdayOfWeek(date: String) =
     LocalDateTime.parse(date,dateFormat).getDayOfWeek.getValue
 
   def getHour(date: String) =
-    println(LocalDateTime.parse(date,dateFormat))
     LocalDateTime.parse(date,dateFormat).getHour
   def getTime(date: String) =
     LocalTime.parse(date,dateFormat)
-
   def getMin(date: String) =
     LocalDateTime.parse(date,dateFormat).getMinute
 
   def convertDate(date: String) =
     LocalDateTime.parse(date,dateFormat).toLocalDate
+
 
   def getDateToday = LocalDate.now()
   
