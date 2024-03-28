@@ -1,5 +1,4 @@
 
-
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter, StreamCorruptedException}
 import java.time.{LocalDateTime, LocalTime}
 import java.util.UUID
@@ -13,7 +12,7 @@ import java.time.format.DateTimeFormatter
 
 object Events {
   // Writes user inputs to a txt file in a correct format.
-  def writetoFile(linesToWrite: Map[String, Seq[String]]):  Unit =
+  def writetoFile(linesToWrite: mutable.LinkedHashMap[String, Seq[String]]):  Unit =
     val fileIn = FileWriter("icalendarformat.txt") // set to true so the writing will append to a file
     var lineWriter = BufferedWriter(fileIn)
 
@@ -35,17 +34,14 @@ object Events {
 
 
 
-  //Match case format parempi :DDD Refraktoroi match case tavaksi
-
-  def iCalderFormatBetter(linestoedit: Seq[Event]): Map[String, Seq[String]] =
+  //Using linkedHashMap to keep the insertion order
+  def iCalderFormatBetter(linestoedit: Seq[Event]): mutable.LinkedHashMap[String, Seq[String]] =
     //randomUUID creates random UUID for the Ics format
     //Date is the key :D
-    //Date should be located at index 1
-    var empty = Map[String,Seq[String]]()
+    var empty = mutable.LinkedHashMap[String,Seq[String]]()
 
     // Checks if the linestoEdit is not empty
     for i <- linestoedit.indices do
-
       empty =  empty ++ Map(linestoedit(i).startTime -> Seq[String](
        if i == 0 then "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//My Calendar Program//Example Corp//EN\nCALSCALE:GREGORIAN\n\n" else "",
       "BEGIN:VEVENT\nUID:" + linestoedit(i).uid+"\n",
@@ -174,7 +170,7 @@ object Events {
       val updatedMap = readFileBetter - key
       writetoFile(iCalderFormatBetter(updatedMap.values.toSeq))
     else
-      writetoFile(Map.empty[String, Seq[String]])
+      writetoFile(mutable.LinkedHashMap.empty[String, Seq[String]])
 
   def getEventName(key: String): String =
     readFileBetter(key).summary.getOrElse("Event has no name")

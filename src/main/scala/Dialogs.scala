@@ -19,7 +19,7 @@ import java.util.UUID
 
 object Dialogs {
   //Result class to store are dialog values
-  case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, alarmDate: String, alarmTime: String)
+  case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, alarmDate: String, alarmTime: String)
   private val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
   // Function to display a dialog for adding a new event
 
@@ -59,10 +59,11 @@ object Dialogs {
           val descriptionInput = new TextField()
 
           val categoryLabel = new Label("Category: COMING SOONG :D")
+          val categoryInput = new TextField()
 
           // Create input fields for alarm date and time
           val alarmdateLabel = new Label("Alarm date")
-          val alarmdateInput = new DatePicker(LocalDate.now)
+          val alarmdateInput = new DatePicker()
 
           val alarmtimeLabel = new Label("Alarm time")
           val alarmtimeInput = new TextField()
@@ -87,7 +88,7 @@ object Dialogs {
           grid.add(descriptionInput, 2, 6)
 
           grid.add(categoryLabel,1,7)
-          //grid.add(categoryInput,2,7)
+          grid.add(categoryInput,2,7)
 
           grid.add(alarmdateLabel,1,8)
           grid.add(alarmdateInput,2,8)
@@ -112,28 +113,26 @@ object Dialogs {
               Result(nameInput.getText,
                 startDateInput.getValue.toString, startTimeInput.getText,
                 endDateInput.getValue.toString, endTimeInput.getText,
-                descriptionInput.getText,
-                alarmdateInput.getValue.toString, alarmtimeInput.getText)
+                descriptionInput.getText, categoryInput.getText,
+                if alarmdateInput.getValue != null then alarmdateInput.getValue.toString else "", alarmtimeInput.getText)
             else
               null
 
           val result = dialog.showAndWait()
 
           result match {
-            case Some(Result(n,s1,s2,e1,e2,d,a1,a2)) => println("name=" + n + "\nstartDate="
+            case Some(Result(n,s1,s2,e1,e2,d,c, a1,a2)) => println("name=" + n + "\nstartDate="
               + s1 + ", startTime=" + s2 + "\nendDate=" + e1 + ", endTime=" + e2 +
               "\ndescription=" + d +
               "\nalarmDate=" + a1 + "  alarmTime=" + a2)
-              userInput(n,s1,s2,e1,e2,d,a1,a2)
+              userInput(n,s1,s2,e1,e2,d,c,a1,a2)
             case Some(_) => println("ErROR :DD")
             case None => println("Dialog returned: None")
           }
 
-        def userInput(summary: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, alarmDate: String, alarmTime: String) =
+        def userInput(summary: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, category: String, alarmDate: String, alarmTime: String) =
           //val category: Option[String] = if description.nonEmpty then Some(category) else None
-          println(dateStart)
-
-          val categories = None
+          //val categories = None
           val stDate: String = dateStart.replace("-", "")
           val stTime: String = timeStart.replace(":", "")
           val stDateTime = stDate+stTime
@@ -142,11 +141,12 @@ object Dialogs {
           val endDateTime = endDate+endTime
           val alarDate = if alarmDate.nonEmpty then alarmDate.replace("-","")  else ""
           val alarTime = if alarmTime.nonEmpty then alarmTime.replace(":","") else ""
+          val category1 = if category.nonEmpty then Some(category) else None
           val summary1 = if summary.isEmpty then None else Some(summary)
           val description1 = if description.isEmpty then None else Some(description)
           val alarmDateTIme: Option[String] = if alarDate.nonEmpty && alarTime.nonEmpty then Some(alarDate + alarTime) else None
 
-          Events.addEventBetter(Event(generateNewUid,stDateTime,endDateTime,summary1,description1, categories, alarmDateTIme))
+          Events.addEventBetter(Event(generateNewUid,stDateTime,endDateTime,summary1,description1, category1, alarmDateTIme))
           Weekly_view.deleteEventsFromGrid
           Events.showEvents.foreach((i)=>Weekly_view.setEventstoGrid(i,Events.getEventEndTime(i)))
 
