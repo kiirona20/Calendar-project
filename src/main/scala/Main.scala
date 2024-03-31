@@ -1,5 +1,6 @@
 
-import Events.groupedByCategories
+import Events.{getDateOnly, getDateToday, getdayOfWeek, groupedByCategories}
+import Weekly_view.dateTracker
 
 import scala.io.StdIn.*
 
@@ -110,7 +111,17 @@ object Main extends App {
     println(Events.groupedByCategories)
     println(Events.allCategories)}
 
-
+@main
+  def testGettingDayRight =
+    println(getdayOfWeek("20240101160000"))
+    println(getDateToday.getDayOfWeek)
+@main
+  def checkHolidays =
+    val today = dateTracker
+    val weekDay = today.getDayOfWeek.getValue
+    val firstDayOfTheWeek = today.minusDays(weekDay)
+    for i <- 1to(7) do
+      println(publIcHolidays.findHoliday(getDateOnly(firstDayOfTheWeek.plusDays(i))))
 
 
 

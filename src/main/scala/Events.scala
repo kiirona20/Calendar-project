@@ -199,6 +199,7 @@ object Events {
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
   private val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
+  private val dayMonthFormat = DateTimeFormatter.ofPattern("MMdd")
 
   def getdayOfWeek(date: String) =
     LocalDateTime.parse(date,dateFormat).getDayOfWeek.getValue
@@ -213,8 +214,9 @@ object Events {
   def convertDate(date: String) =
     LocalDateTime.parse(date,dateFormat).toLocalDate
 
-
   def getDateToday = LocalDate.now()
+  
+  def getDateOnly(date:LocalDate) = date.format(dayMonthFormat)
   
  
 

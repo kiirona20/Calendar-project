@@ -15,4 +15,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion
 )
 
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime
+
+

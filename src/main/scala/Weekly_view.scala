@@ -115,8 +115,7 @@ object Weekly_view extends JFXApp3:
    allEventChildren.foreach((i)=> gridpane.children -= i)
           // Empty the list of all events
    allEventChildren = allEventChildren.empty
-   println(Events.showEvents.foreach((i)=>
-   (i,Events.getEventEndTime(i))))
+
         // Add all events to the grid
    Events.showEvents.foreach((i)=>
    setEventstoGrid(i,Events.getEventEndTime(i)))
@@ -170,10 +169,20 @@ object Weekly_view extends JFXApp3:
         gridpane.add(date,0,0)
 
 
+        val weekDay = dateTracker.getDayOfWeek.getValue
+        val firstDayOfTheWeek = dateTracker.minusDays(weekDay)
         //add labels for each day of the week
         for i <- days.indices do
+          val check = publIcHolidays.findHoliday(Events.getDateOnly(firstDayOfTheWeek.plusDays(i+1)))
+          val vbox = new VBox()
           val label = new Label(days(i))
-          gridpane.add(label,i+1,0)
+          vbox.getChildren.add(label)
+
+          if check.nonEmpty then
+            val label2 = new Label(check)
+            vbox.getChildren.add(label2)
+          gridpane.add(vbox,i+1,0)
+
 
         //add buttons to move between weeks
         val button1 = new Button("<--")
