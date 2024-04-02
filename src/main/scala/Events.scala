@@ -213,11 +213,15 @@ object Events {
 
   def convertDate(date: String) =
     LocalDateTime.parse(date,dateFormat).toLocalDate
+    
+  def convertDateTime(date: String) =
+    LocalDateTime.parse(date,dateFormat)
 
   def getDateToday = LocalDate.now()
   
   def getDateOnly(date:LocalDate) = date.format(dayMonthFormat)
   
+  def convertLocalDateTimeToFormat(date: LocalDateTime) = date.format(dateFormat)
  
 
 

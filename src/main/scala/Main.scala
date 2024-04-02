@@ -2,6 +2,7 @@
 import Events.{getDateOnly, getDateToday, getdayOfWeek, groupedByCategories}
 import Weekly_view.dateTracker
 
+import java.time.LocalDateTime
 import scala.io.StdIn.*
 
 object Main extends App {
@@ -41,13 +42,17 @@ object Main extends App {
   val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, mörkö, CONFERENCE,20230512120000"
   val testEvent3 = "20230512140000,20230512160000, hopefully this works :(, kokki, CONFERENCE,20230512130000"
   val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, emt, CONFERENCE,  "
-  val event12 = Event( "jotain1", "20240322160000","20240322190000", Some("joe"), Some("joe"), Some("tapaaminen"), Some("20240322150000"))
+  val event12 = Event( "jotain1", "20240322160000","20240322190000", Some("joe"), Some("joe"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(7))))
   val event13 = Event( "jotain2", "20240323160000","20240323190000", None, None, None, None)
-  val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"), Some("20240322150000"))
+  val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(10))))
   val testFilter = Seq("tapaaminen")
   val event15 = Event( "mopo", "20240424160000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), None)
+  val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(5))))
 
 
+@main
+  def alarm =
+    eventAlarm
 
 //@main
   //def testWriting =
