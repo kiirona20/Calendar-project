@@ -1,12 +1,14 @@
-import java.time.{Duration, LocalDateTime}
-import scala.concurrent.Future
+import java.time.Duration.between
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.FiniteDuration
+
 class Event(var uid:String = "", var startTime: String = "",
             var endTime: String = "", var summary: Option[String] = None,
             var description: Option[String] = None, var categories: Option[String] = None,
             var trigger: Option[String] = None){
 
-  println(trigger)
   def findAndEdit(element: String, change: Option[String]): Unit =
     val check = change.isDefined
     element match
@@ -17,11 +19,16 @@ class Event(var uid:String = "", var startTime: String = "",
       case "categories" => categories = change
       case "trigger" => trigger = change
       case _ => println("Element not found or cannot be changed")
+      
+  //Checks if the alarm is defined    
   if trigger.isDefined then
-    val timeNow: LocalDateTime = LocalDateTime.now
-
-    val d = Duration.between(timeNow,Events.convertDateTime(trigger.get))
-    Thread.sleep(d)
-    Future(println(s"Something Happens ${summary}"))
-}
+    val triggerTime = Events.convertDateTime(trigger.get)
+    //Calculates the between time Using java.Time library
+    val javaDuration = between(LocalDateTime.now(),triggerTime)
+    //Converts it to scala finiteDuration type
+    val scalaDuration = FiniteDuration.apply(javaDuration.toSeconds, TimeUnit.SECONDS)
+    //Check that there are no alarms that has passed already
+    if scalaDuration.>=(FiniteDuration.apply(1,TimeUnit.SECONDS)) then
+      Alarm(scalaDuration, summary.getOrElse("No name for the task"))
+  }
 

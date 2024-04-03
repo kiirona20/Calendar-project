@@ -1,6 +1,7 @@
 
 import Events.{getDateOnly, getDateToday, getdayOfWeek, groupedByCategories}
 import Weekly_view.dateTracker
+import akka.actor.{ActorSystem, Props}
 
 import java.time.LocalDateTime
 import scala.io.StdIn.*
@@ -44,15 +45,15 @@ object Main extends App {
   val testEvent4 = "20230512190000,20230303200000, hopefully this works :(, emt, CONFERENCE,  "
   val event12 = Event( "jotain1", "20240322160000","20240322190000", Some("joe"), Some("joe"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(7))))
   val event13 = Event( "jotain2", "20240323160000","20240323190000", None, None, None, None)
-  val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(10))))
+  val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.minusSeconds(10))))
   val testFilter = Seq("tapaaminen")
   val event15 = Event( "mopo", "20240424160000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), None)
   val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(5))))
 
 
-@main
-  def alarm =
-    eventAlarm
+//@main
+  //def alarm =
+    //eventAlarm
 
 //@main
   //def testWriting =
@@ -73,7 +74,8 @@ object Main extends App {
     println(Events.groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys))
     println(Events.showEvents)
 
-
+@main
+  def AlarmTest = eventAlarm
 
 @main
   def testAdding = Events.addEventBetter(event15)// start time should be unique

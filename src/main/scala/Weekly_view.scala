@@ -124,7 +124,7 @@ object Weekly_view extends JFXApp3:
 
   // Define an Actor for handling reminders
 
-  class ReminderActor extends Actor {
+ /** class ReminderActor extends Actor {
     import context.dispatcher
 
     // The receive method handles incoming messages to this actor
@@ -140,7 +140,7 @@ object Weekly_view extends JFXApp3:
   }
   // Create an ActorSystem and an actor of type ReminderActor
   val system = ActorSystem("ReminderSystem")
-  val reminderActor = system.actorOf(Props(new ReminderActor), "reminderActor")
+  val reminderActor = system.actorOf(Props(new ReminderActor), "reminderActor")*/
   private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
 

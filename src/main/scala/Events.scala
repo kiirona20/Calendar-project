@@ -201,21 +201,23 @@ object Events {
   private val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
   private val dayMonthFormat = DateTimeFormatter.ofPattern("MMdd")
 
-  def getdayOfWeek(date: String) =
+  def getdayOfWeek(date: String): Int =
     LocalDateTime.parse(date,dateFormat).getDayOfWeek.getValue
 
-  def getHour(date: String) =
-    LocalDateTime.parse(date,dateFormat).getHour
-  def getTime(date: String) =
-    LocalTime.parse(date,dateFormat)
-  def getMin(date: String) =
-    LocalDateTime.parse(date,dateFormat).getMinute
+  def getHour(date: String): Int =
+    LocalDateTime.parse(date, dateFormat).getHour
 
-  def convertDate(date: String) =
-    LocalDateTime.parse(date,dateFormat).toLocalDate
-    
-  def convertDateTime(date: String) =
-    LocalDateTime.parse(date,dateFormat)
+  def getTime(date: String): LocalTime =
+    LocalTime.parse(date, dateFormat)
+
+  def getMin(date: String): Int =
+    LocalDateTime.parse(date, dateFormat).getMinute
+
+  def convertDate(date: String): LocalDate =
+    LocalDateTime.parse(date, dateFormat).toLocalDate
+
+  def convertDateTime(date: String): LocalDateTime =
+    LocalDateTime.parse(date, dateFormat)
 
   def getDateToday = LocalDate.now()
   
