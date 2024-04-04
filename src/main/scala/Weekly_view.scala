@@ -30,6 +30,7 @@ import java.time.{Duration, LocalDateTime}
 
 object Weekly_view extends JFXApp3:
   // Define a case class to represent a reminder
+ 
  var allEventChildren = List[Node]()
       // Variables for scene size
  var sceneWidth = 800.0
@@ -42,8 +43,8 @@ object Weekly_view extends JFXApp3:
         //Helper function for setting things to the grid
  def setEventstoGrid(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
-   val convertedDateStart = Events.convertDate(dateStart)
-   val convertedDateEnd = Events.convertDate(dateEnd)
+   val convertedDateStart = Events.convertStringToDate(dateStart)
+   val convertedDateEnd = Events.convertStringToDate(dateEnd)
           // Get the weekday of the current date
    val weekDay = dateTracker.getDayOfWeek.getValue
           // Get the start date of the current week
@@ -60,10 +61,10 @@ object Weekly_view extends JFXApp3:
               // Initialize start and end time variables
        var startTime = LocalTime.MIDNIGHT
        if (currentDate.isEqual(convertedDateStart)) then
-         startTime = Events.getTime(dateStart)
+         startTime = Events.convertStringToTime(dateStart)
        var endTime: LocalTime = LocalTime.MAX
        if currentDate.isEqual(convertedDateEnd) then
-         endTime = Events.getTime(dateEnd)
+         endTime = Events.convertStringToTime(dateEnd)
               // Calculate start and end time ratios
        val y = startTime.getHour
        val minStart = startTime.getMinute.toDouble
@@ -88,8 +89,8 @@ object Weekly_view extends JFXApp3:
               // Create a tooltip for the event
        val tooltip = new Tooltip()
        tooltip.setText("Event name: " + Events.getEventName(dateStart) + "\n" +
-       "Event start time: " + Events.convertDate(dateStart) + "\n" +
-       "Event end time: " + Events.convertDate(dateEnd) + "\n" +
+       "Event start time: " + Events.convertStringToDate(dateStart) + "\n" +
+       "Event end time: " + Events.convertStringToDate(dateEnd) + "\n" +
        "Event description: " + Events.getEventDescription(dateStart))
               // Add the event name to the stack
        val label = new Label(Events.getEventName(dateStart))
@@ -120,28 +121,7 @@ object Weekly_view extends JFXApp3:
    Events.showEvents.foreach((i)=>
    setEventstoGrid(i,Events.getEventEndTime(i)))
 
- case class Reminder(task: String, when: Duration)
-
-  // Define an Actor for handling reminders
-
- /** class ReminderActor extends Actor {
-    import context.dispatcher
-
-    // The receive method handles incoming messages to this actor
-    def receive = {
-      // When receiving a Reminder, schedule the task to be done after a specified duration
-      case Reminder(task, when) =>
-        val duration = scala.concurrent.duration.Duration.fromNanos(when.toNanos).asInstanceOf[FiniteDuration]
-        context.system.scheduler.scheduleOnce(duration, self, task)
-      // When receiving a task, print a reminder
-      case (task) =>
-        println("Remember your" + task)
-    }
-  }
-  // Create an ActorSystem and an actor of type ReminderActor
-  val system = ActorSystem("ReminderSystem")
-  val reminderActor = system.actorOf(Props(new ReminderActor), "reminderActor")*/
-  private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
+ private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
 
   // Define a start function to set up a weekly calendar

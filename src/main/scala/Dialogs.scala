@@ -188,32 +188,50 @@ object Dialogs {
           val nameInput = new TextField()
           nameInput.setText(Events.getEventName(key))
           val startDateLabel = new Label("Start Date:")
-          val startDateInput = new DatePicker(Events.convertDate(key))
+          val startDateInput = new DatePicker(Events.convertStringToDate(key))
           val startTimeLable = new Label("Start Time:")
           val startTimeInput = new TextField()
           //startTimeInput.textFormatter = new TextFormatter(timeConverter)
-          startTimeInput.setText(Events.getTime(key).format(format))
-          println("Event start time" + Events.getTime(key).format(format))
+          startTimeInput.setText(Events.convertStringToTime(key).format(format))
+          println("Event start time" + Events.convertStringToTime(key).format(format))
 
           //forces user to use specific format :D
           //startTimeInput.textFormatter = new TextFormatter(timeConverter)
           startDateInput.getEditor.setDisable(true)
           val endDateLabel = new Label("End Time:")
-          val endDateInput = new DatePicker(Events.convertDate(Events.getEventEndTime(key)))
+          val endDateInput = new DatePicker(Events.convertStringToDate(Events.getEventEndTime(key)))
           println("Event end Date:" + Events.getEventEndTime(key))
           endDateInput.getEditor.setDisable(true)
 
           val endTimeLable = new Label("End Time:")
           val endTimeInput = new TextField()
           //endTimeInput.textFormatter = new TextFormatter(timeConverter)
-          println("Event end time:" + Events.getTime(Events.getEventEndTime(key)).format(format))
+          println("Event end time:" + Events.convertStringToTime(Events.getEventEndTime(key)).format(format))
 
-          endTimeInput.setText(Events.getTime(Events.getEventEndTime(key)).format(format))
+          endTimeInput.setText(Events.convertStringToTime(Events.getEventEndTime(key)).format(format))
 
 
           val descriptionLabel = new Label("Description:")
           val descriptionInput = new TextField()
           descriptionInput.setText(Events.getEventDescription(key))
+
+
+          val categoryLabel = new Label("Category: COMING SOONG :D")
+          val categoryInput = new TextField()
+          categoryInput.setText(Events.getCategorie(key))
+
+
+          // Create input fields for alarm date and time
+          val alarmdateLabel = new Label("Alarm date")
+          val alarmdateInput = new DatePicker()
+          //Events.convertStringToDate(Events.getAlarm(key))
+
+          val alarmtimeLabel = new Label("Alarm time")
+          val alarmtimeInput = new TextField()
+          //alarmtimeInput.setText(Events.convertStringToTime(Events.getAlarm(key)).toString)
+
+
+
           println("Event description:" + Events.getEventDescription(key))
 
           grid.add(nameLabel, 1, 1)
@@ -232,30 +250,38 @@ object Dialogs {
           grid.add(descriptionLabel, 1, 6)
           grid.add(descriptionInput, 2, 6)
 
+          grid.add(categoryLabel,1,7)
+          grid.add(categoryInput,2,7)
+
+          grid.add(alarmdateLabel,1,8)
+          grid.add(alarmdateInput,2,8)
+
+          grid.add(alarmtimeLabel,1,9)
+          grid.add(alarmtimeInput,2,9)
+
           dialog.getDialogPane.setContent(grid)
 
           dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel)
 
           val updateButton = new Button("Update")
-          grid.add(updateButton, 2, 7)
-
-          val oldName = Events.getEventName(key)
-          val oldStartDate = key
-          val oldEndDate= Events.getEventEndTime(key)
-          val oldDescription = Events.getEventDescription(key)
-
+          grid.add(updateButton, 2, 10)
 
 
           updateButton.onAction = (e: ActionEvent) =>
-            val newName = if nameInput.text != null then nameInput.getText else oldName
-            val newStartDate = startDateInput.getValue.toString.replace("-","") + startTimeInput.getText.replace(":","")
-            val newEndDate = endDateInput.getValue.toString.replace("-","") + endTimeInput.getText.replace(":","")
-            val newDescription = if descriptionInput.text != null then descriptionInput.getText else oldDescription
+            val newName: Option[String] = if nameInput.text != null then Some(nameInput.getText) else None
+            val newStartDate: Option[String] = Some(startDateInput.getValue.toString.replace("-", "") + startTimeInput.getText.replace(":", ""))
+            val newEndDate: Option[String] = Some(endDateInput.getValue.toString.replace("-", "") + endTimeInput.getText.replace(":", ""))
+            val newDescription: Option[String] = if descriptionInput.text != null then Some(descriptionInput.getText) else None
+            val newCategory: Option[String] = if categoryInput.text != null then Some(categoryInput.getText) else None
+            val newAlarm: Option[String] = if alarmdateInput.getEditor.getText.nonEmpty && alarmtimeInput.getText.nonEmpty then
+              Some(alarmdateInput.getValue.toString.replace("-", "") + alarmtimeInput.getText.replace(":", "")) else None
 
-            Events.editEventBetter(key,"startTime",Some(newStartDate))
-            Events.editEventBetter(key,"endTime" ,Some(newEndDate))
-            Events.editEventBetter(key,"description",Some(newDescription))
-            Events.editEventBetter(key,"summary",Some(newName))
+            Events.editEventBetter(key,"startTime",newStartDate)
+            Events.editEventBetter(key,"endTime" ,newEndDate)
+            Events.editEventBetter(key,"description",newDescription)
+            Events.editEventBetter(key,"summary",newName)
+            Events.editEventBetter(key,"categories", newCategory)
+            Events.editEventBetter(key,"trigger", newAlarm)
             dialog.close()
 
 

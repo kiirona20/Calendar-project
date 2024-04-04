@@ -84,58 +84,58 @@ object Events {
     var baseEvent = new Event
 
 
-    try
-      var currentLine = lineReader.readLine()
-      if currentLine == null then return storedEventsBetter
+    
+    var currentLine = lineReader.readLine()
+    if currentLine == null then return storedEventsBetter
 
-      currentLine = lineReader.readLine()
-      while currentLine != null do
-        currentLine = currentLine
-        var sisalto = currentLine
+    currentLine = lineReader.readLine()
+    while currentLine != null do
+      currentLine = currentLine
+      var sisalto = currentLine
 
-        currentLine = currentLine match
-          case sisalto if sisalto.startsWith("BEGIN:VEVENT") =>
-            beginV = true
+      currentLine = currentLine match
+        case sisalto if sisalto.startsWith("BEGIN:VEVENT") =>
+          beginV = true
             //reset event
-            baseEvent = new Event
-            lineReader.readLine()
+          baseEvent = new Event
+          lineReader.readLine()
 
-          case sisalto if sisalto.startsWith("UID:") =>
-            hasUId = true
-            baseEvent.uid = (currentLine.slice(4, 40))
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("DTSTART") =>
-            startDateTime = true
-            baseEvent.startTime = currentLine.slice(8,16) + currentLine.slice(17,23)
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("DTEND:") => storedData += "dtend detected"
-            endDateTime = true
-            baseEvent.endTime = currentLine.slice(6,14) + currentLine.slice(15,21)
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("SUMMARY:") => storedData += "summary detected"
-            baseEvent.summary = Some(currentLine.drop(8))
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("DESCRIPTION:") => storedData += "description detected"
-            baseEvent.description = Some(currentLine.drop(12))
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("CATEGORIES:") => storedData += "categories detected"
-            baseEvent.categories = (Some(currentLine.drop(11)))
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("TRIGGER:") => storedData += "trigger detected"
-            baseEvent.trigger = (Some(currentLine.slice(8,16) + currentLine.slice(17,23)))
-            lineReader.readLine()
-          case sisalto if sisalto.startsWith("END:VEVENT") => storedData += "Laita asiat pakettiin"
-            endV = true
-            lineReader.readLine()
-          case _ => lineReader.readLine()
+        case sisalto if sisalto.startsWith("UID:") =>
+          hasUId = true
+          baseEvent.uid = (currentLine.slice(4, 40))
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("DTSTART") =>
+          startDateTime = true
+          baseEvent.startTime = currentLine.slice(8,16) + currentLine.slice(17,23)
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("DTEND:") => storedData += "dtend detected"
+          endDateTime = true
+          baseEvent.endTime = currentLine.slice(6,14) + currentLine.slice(15,21)
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("SUMMARY:") => storedData += "summary detected"
+          baseEvent.summary = Some(currentLine.drop(8))
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("DESCRIPTION:") => storedData += "description detected"
+          baseEvent.description = Some(currentLine.drop(12))
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("CATEGORIES:") => storedData += "categories detected"
+          baseEvent.categories = (Some(currentLine.drop(11)))
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("TRIGGER:") => storedData += "trigger detected"
+          baseEvent.trigger = (Some(currentLine.slice(8,16) + currentLine.slice(17,23)))
+          lineReader.readLine()
+        case sisalto if sisalto.startsWith("END:VEVENT") => storedData += "Laita asiat pakettiin"
+          endV = true
+          lineReader.readLine()
+        case _ => lineReader.readLine()
         //If there is all the essential data for creating event the event is stored in a Map
-        if beginV && startDateTime && hasUId && endDateTime && endV then
-          storedEventsBetter += baseEvent.startTime -> baseEvent
-          beginV = false
-          hasUId = false
-          startDateTime = false
-          endDateTime = false
-          endV = false
+      if beginV && startDateTime && hasUId && endDateTime && endV then
+        storedEventsBetter += baseEvent.startTime -> baseEvent
+        beginV = false
+        hasUId = false
+        startDateTime = false
+        endDateTime = false
+        endV = false
 
 
 
@@ -153,7 +153,6 @@ object Events {
   def showEventDetails(userInput: String) = readFileBetter(userInput)
 
 //KEY IS STARTINGDATEANDTIME
-//toimii kai
   def editEventBetter(key: String, edit: String, toWhat: Option[String]): Unit =
     val listOfEvents = readFileBetter
     if !listOfEvents.contains(key) then
@@ -173,15 +172,17 @@ object Events {
       writetoFile(mutable.LinkedHashMap.empty[String, Seq[String]])
 
   def getEventName(key: String): String =
-    readFileBetter(key).summary.getOrElse("Event has no name")
+    readFileBetter(key).summary.getOrElse("")
 
   def getEventEndTime(key: String): String =
     readFileBetter(key).endTime
   def getEventDescription(key: String): String =
-    readFileBetter(key).description.getOrElse("Event has no description")
-  // 0 = UID 1 = start time 2 = end time 3 = summary  4 = description 5 = categories 6 = alarm
-  def getCategorie(key: String) =
-    readFileBetter(key).categories.getOrElse("Event has no category")
+    readFileBetter(key).description.getOrElse("")
+  def getCategorie(key: String): String =
+    readFileBetter(key).categories.getOrElse("")
+  def getAlarm(key: String): String =
+    readFileBetter(key).trigger.getOrElse("")
+    
 
 
   def groupedByCategories =
@@ -207,16 +208,17 @@ object Events {
   def getHour(date: String): Int =
     LocalDateTime.parse(date, dateFormat).getHour
 
-  def getTime(date: String): LocalTime =
-    LocalTime.parse(date, dateFormat)
 
   def getMin(date: String): Int =
     LocalDateTime.parse(date, dateFormat).getMinute
 
-  def convertDate(date: String): LocalDate =
+  def convertStringToTime(date: String): LocalTime =
+    LocalTime.parse(date, dateFormat)  
+  
+  def convertStringToDate(date: String): LocalDate =
     LocalDateTime.parse(date, dateFormat).toLocalDate
 
-  def convertDateTime(date: String): LocalDateTime =
+  def convertStringToDateTIme(date: String): LocalDateTime =
     LocalDateTime.parse(date, dateFormat)
 
   def getDateToday = LocalDate.now()

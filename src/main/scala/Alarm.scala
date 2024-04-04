@@ -10,8 +10,7 @@ import scala.concurrent.duration.*
 
 
 
-class Alarm(trigger: FiniteDuration, taskName: String) {  
-  case class alarmDifference(alarmSetTrigger: LocalDateTime)
+class Alarm(trigger: FiniteDuration, taskName: String) {
   object someActor extends Actor {
     def receive = {
       case s:FiniteDuration =>
@@ -20,10 +19,10 @@ class Alarm(trigger: FiniteDuration, taskName: String) {
         context.system.terminate()
     }
   }
-    val system = ActorSystem("Alarm")
-    val actor = system.actorOf(Props(someActor),"Alarm")
-    implicit val ec: ExecutionContext = system.dispatcher
-    system.scheduler.scheduleOnce(trigger)(actor ! trigger)
+  val system = ActorSystem("Alarm")
+  val actor = system.actorOf(Props(someActor), "Alarm")
+  implicit val ec: ExecutionContext = system.dispatcher
+  val alarmEvent = system.scheduler.scheduleOnce(trigger)(actor ! trigger)
 
   
 }

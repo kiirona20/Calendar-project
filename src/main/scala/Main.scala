@@ -9,35 +9,6 @@ import scala.io.StdIn.*
 object Main extends App {
     //Should work with this input = name,202003031700,202003031800, hopefully this works :D
 
- /** println("Choose to add an event, edit event or delete an event")
-  var userInput = readLine()
-
-  if userInput.toLowerCase == "add" then
-    println("Write the event name, date, starTime, endTime and description. Seperate these by comma ','")
-    userInput = readLine()
-    Events.addEvent(userInput)
-
-
-  if userInput.toLowerCase == "edit" then
-    println("Which event do you wish to edit\nList of recorded events: " + Events.readFile.keys)
-    userInput = readLine()
-    println("What do you wish to edit?" + Events.showEventDetails(userInput))
-    var userInput2 = readLine()
-    println("To what do you wish it to change?")
-    var userInput3 = readLine()
-    val stuffChanged = Events.editEvent(userInput,(userInput2,userInput3))
-
-
-
-  if userInput.toLowerCase == "delete" then
-    println("Which event do you wish to delete\nList of recorded events: " + Events.readFile.keys)
-    userInput = readLine()
-    Events.deleteEvent(userInput)
-    println(Events.readFile)}
-
-
-*/
-
 
   val testEvent = "20230512160000,20230513190000, hopefully this works :(, kiva, CONFERENCE,20230512110000"
   val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, mörkö, CONFERENCE,20230512120000"
@@ -48,7 +19,7 @@ object Main extends App {
   val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.minusSeconds(10))))
   val testFilter = Seq("tapaaminen")
   val event15 = Event( "mopo", "20240424160000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), None)
-  val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(5))))
+  val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(15))))
 
 
 //@main
@@ -75,7 +46,9 @@ object Main extends App {
     println(Events.showEvents)
 
 @main
-  def AlarmTest = eventAlarm
+  def AlarmTest = 
+    eventAlarm
+    
 
 @main
   def testAdding = Events.addEventBetter(event15)// start time should be unique
@@ -90,7 +63,7 @@ object Main extends App {
     Events.deleteEvent("20240323160000")
 @main
   def converDAte =
-    println(Events.convertDate("20240324190000"))
+    println(Events.convertStringToDate("20240324190000"))
 
 @main
   def testdateformat =
@@ -106,7 +79,7 @@ object Main extends App {
 
 @main
   def testGetTime =
-    println(Events.getTime("20240324190000"))
+    println(Events.convertStringToTime("20240324190000"))
 @main
   def testgetInfo =
     println(Events.getEventName("20240322160000"))
@@ -114,7 +87,7 @@ object Main extends App {
     println(Events.getEventEndTime("20240322160000"))
 
     println(Events.getMin("20240322160000"))
-    println(Events.getTime("20240322160000").toString)
+    println(Events.convertStringToTime("20240322160000").toString)
     println(Events.groupedByCategories)
     println(Events.allCategories)}
 
