@@ -44,7 +44,7 @@ object Weekly_view extends JFXApp3:
  var dateTracker = Events.getDateToday
  private val gridpane = new GridPane
         //Helper function for setting things to the grid
- def setEventstoGrid(dateStart: String, dateEnd: String) =
+ def setEventtoGrid(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
    val convertedDateStart = Events.convertStringToDate(dateStart)
    val convertedDateEnd = Events.convertStringToDate(dateEnd)
@@ -63,29 +63,48 @@ object Weekly_view extends JFXApp3:
        val x = currentDate.getDayOfWeek.getValue
               // Initialize start and end time variables
        var startTime = LocalTime.MIDNIGHT
-       if (currentDate.isEqual(convertedDateStart)) then
+       // Checks if the currentDate is same as starting date
+       // If not then startTime starts at 00:00. This is in case of events that lasts longer than 1 day
+       if currentDate.isEqual(convertedDateStart) then
          startTime = Events.convertStringToTime(dateStart)
+
        var endTime: LocalTime = LocalTime.MAX
+
+       // Chekcs if the currentDate is same as end Date
+       // If not then endTime is 23:59. This is in case of events that lasts longer than 1 day
        if currentDate.isEqual(convertedDateEnd) then
          endTime = Events.convertStringToTime(dateEnd)
-              // Calculate start and end time ratios
+       // Calculate start and end time ratios
        val hourStart = startTime.getHour
        val minStart = startTime.getMinute.toDouble
        val hourEnd = endTime.getHour
+
        val minuteEnd = endTime.getMinute.toDouble
 
-              // Calculate proportions of total day's height
 
+        // Calculate start and end time ratios
        val startTimeRatio = (hourStart + minStart / 60) / 24
        val endTimeRatio = (hourEnd + minuteEnd / 60) / 24
-              // Calculate total height of the event based on screen height (1000)
+              // Calculate total height of the event based on screen height
        val eventHeight = (endTimeRatio - startTimeRatio) * sceneHeight
               // Calculate the Y offset to position the event correctly in the grid
        val eventOffset = (minStart / 60) * (sceneHeight / amountOfColumnds)
-              // Create a stack pane for the event
+
+
+       // Calculate row span for the event
+       var rowSpanMinute = 0
+       if minuteEnd>minStart then
+         rowSpanMinute = 1
+       //how many cells does the event occupy
+       val eventRowSpan = hourEnd - hourStart + rowSpanMinute
+       println("THis is hourEnd" + hourEnd)
+
+       // Create a stack pane for the event
+
        val stack = new StackPane()
        val rectangle = new Rectangle()
-       rectangle.width = sceneWidth/amountOfRows
+       rectangle.width = sceneWidth/amountOfRows-10
+
        rectangle.height = eventHeight
        rectangle.fill = Color.Green
               // Align the stack and shift it down
@@ -106,18 +125,13 @@ object Weekly_view extends JFXApp3:
        allEventChildren = allEventChildren.appended(stack)
               // Add the stack to the grid
        gridpane.add(stack, x, hourStart+1)
-              // Calculate row span for the event
-       var rowSpanMinute = 0
-       if minuteEnd>minStart then
-         rowSpanMinute = 1
 
-       val eventRowSpan = hourEnd - hourStart + rowSpanMinute
 
 
        //
               // Set the row span for the stack in the grid
        GridPane.setRowSpan(stack, eventRowSpan)
-       println(GridPane.getRowSpan(stack))
+       println("row constraints" + gridpane.getRowConstraints)
 
             // Move to the next day
      currentDate = currentDate.plusDays(1)
@@ -133,7 +147,7 @@ object Weekly_view extends JFXApp3:
 
         // Add all events to the grid
    Events.showEvents.foreach((i)=>
-   setEventstoGrid(i,Events.getEventEndTime(i)))
+   setEventtoGrid(i,Events.getEventEndTime(i)))
 
  private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
@@ -150,7 +164,7 @@ object Weekly_view extends JFXApp3:
       sceneHeight = bounds.getHeight - 80
 
       scene = new Scene(sceneWidth,sceneHeight){
-
+        sceneHeight = sceneHeight-10
         private val tabPane = new TabPane
         private val tab1 = new Tab
         private val tab2 = new Tab
@@ -174,6 +188,9 @@ object Weekly_view extends JFXApp3:
         val constraint = new RowConstraints
         constraint.setPercentHeight(rowsHeightPercentage)
 
+        constraint.setPrefHeight(sceneHeight/25)
+        constraint.setMaxHeight(sceneHeight/25)
+        constraint.setMinHeight(sceneHeight/25)
         gridpane.getRowConstraints.add(constraint)
 
         var date = new Label(dateTracker.toString)
@@ -223,14 +240,14 @@ object Weekly_view extends JFXApp3:
           dateTracker = dateTracker.minusWeeks(1)
           date.text = dateTracker.toString
           deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
+          Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i)))
           putWeekdaysAndHolidays
         }
         button2.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.plusWeeks(1)
           date.text = dateTracker.toString
           deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>setEventstoGrid(i,Events.getEventEndTime(i)))
+          Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i)))
           putWeekdaysAndHolidays
 
         }
@@ -241,6 +258,10 @@ object Weekly_view extends JFXApp3:
         for i <- 0 until(24) do
             val row = new RowConstraints()
             row.percentHeight = rowsHeightPercentage
+            row.setMaxHeight(sceneHeight/25)
+            row.setMinHeight(sceneHeight/25)
+            row.setPrefHeight(sceneHeight/25)
+
             gridpane.getRowConstraints.add(row)
             val label = new Label(clock.toString)
 
@@ -265,5 +286,6 @@ object Weekly_view extends JFXApp3:
 
         tabPane.tabs = List(tab1,tab2)
         root = tabPane
+
       }
     }

@@ -1,4 +1,4 @@
-import Weekly_view.{gridpane, setEventstoGrid}
+import Weekly_view.{gridpane, setEventtoGrid}
 import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx}
 import scalafx.beans.property.BooleanProperty
 import scalafx.Includes.*
@@ -148,7 +148,7 @@ object Dialogs {
 
           Events.addEventBetter(Event(generateNewUid,stDateTime,endDateTime,summary1,description1, category1, alarmDateTIme))
           Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventstoGrid(i,Events.getEventEndTime(i)))
+          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
 
         def editEventDialog: Unit =
           val dialog = new Dialog[Unit]()
@@ -289,7 +289,7 @@ object Dialogs {
 
           dialog.showAndWait()
           Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventstoGrid(i,Events.getEventEndTime(i)))
+          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
 
 
 
@@ -315,7 +315,7 @@ object Dialogs {
             if selected != null then
               Events.deleteEvent(selected.toString)
               Weekly_view.deleteEventsFromGrid
-              Events.showEvents.foreach((i)=>Weekly_view.setEventstoGrid(i,Events.getEventEndTime(i)))
+              Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
             listView.items = listView.items.apply().diff(Seq(selected))
 
 
@@ -348,7 +348,7 @@ object Dialogs {
           dialog.getDialogPane.getButtonTypes.addAll( ButtonType.Cancel, ButtonType.Finish)
           dialog.showAndWait()
           Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventstoGrid(i,Events.getEventEndTime(i)))
+          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
            //Should work with this input = name,202003031700,202003031800, hopefully this works :D
        def handleCheckBox(boxes: Seq[CheckBox]) =
          var selectedList: Seq[String] = Seq[String]()
