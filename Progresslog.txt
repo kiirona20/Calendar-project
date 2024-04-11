@@ -18,5 +18,5 @@ implemented.
 - Importing and exporting alarm seems to have some problems -> Google calendar doesnt record any alarms
 - Workload about 25h
 The project is a little bit behind the phase as planned.
-Until the next meeting, goal is to implement all the medium level task
+Until the next meeting, goal is to implement all the medium level tasks
 
