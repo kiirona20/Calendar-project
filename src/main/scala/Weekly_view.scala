@@ -27,14 +27,15 @@ import scalafx.scene.control.Alert.AlertType
 
 import scala.concurrent.duration.*
 import java.time.{Duration, LocalDateTime}
+import scala.concurrent.Future
 
 object Weekly_view extends JFXApp3:
   // Define a case class to represent a reminder
  
  var allEventChildren = List[Node]()
       // Variables for scene size
- var sceneWidth = 900.0
- var sceneHeight = 1000.0
+ var sceneWidth = 0.0
+ var sceneHeight = 0.0
  val amountOfRows = 10
  val amountOfColumnds = 25
      // Define the days of the week
@@ -106,14 +107,17 @@ object Weekly_view extends JFXApp3:
               // Add the stack to the grid
        gridpane.add(stack, x, hourStart+1)
               // Calculate row span for the event
-       var rowSpan = 1
+       var rowSpanMinute = 0
        if minuteEnd>minStart then
-         rowSpan = 0
-         println(minuteEnd)
-         println(minStart)
-       val eventRowSpan = hourEnd - hourStart + rowSpan
+         rowSpanMinute = 1
+
+       val eventRowSpan = hourEnd - hourStart + rowSpanMinute
+
+
+       //
               // Set the row span for the stack in the grid
        GridPane.setRowSpan(stack, eventRowSpan)
+       println(GridPane.getRowSpan(stack))
 
             // Move to the next day
      currentDate = currentDate.plusDays(1)
@@ -141,6 +145,10 @@ object Weekly_view extends JFXApp3:
     // Define the stage
     stage = new JFXApp3.PrimaryStage{
       title = "Calendar"
+      val bounds = Screen.primary.getVisualBounds
+      sceneWidth = bounds.getWidth - 10
+      sceneHeight = bounds.getHeight - 80
+
       scene = new Scene(sceneWidth,sceneHeight){
 
         private val tabPane = new TabPane
@@ -153,13 +161,21 @@ object Weekly_view extends JFXApp3:
         // Enable grid lines for debugging purposes
         gridpane.gridLinesVisible = true
 
-        //Column width persentage set to 100/8 (7 days + time column + buttons)
+        //Column width persentage set to 100/10 (7 days + time column + buttons)
         val columnWidthPercentage = 100 / 10
         for i <- 0 until(10) do
           val column = new ColumnConstraints()
+
           column.percentWidth = columnWidthPercentage
-          gridpane.getColumnConstraints().add(column)
+          gridpane.getColumnConstraints.add(column)
         //add date label
+
+        val rowsHeightPercentage = 100 / 25
+        val constraint = new RowConstraints
+        constraint.setPercentHeight(rowsHeightPercentage)
+
+        gridpane.getRowConstraints.add(constraint)
+
         var date = new Label(dateTracker.toString)
         gridpane.add(date,0,0)
 
@@ -170,17 +186,14 @@ object Weekly_view extends JFXApp3:
           //add labels for each day of the week
           for i <- days.indices do
             val check = publIcHolidays.findHoliday(Events.getDateOnly(firstDayOfTheWeek.plusDays(i+1)))
-            val vbox = new VBox()
-            val label = new Label(days(i))
-            vbox.getChildren.add(label)
-
+            val label = new Label()
             if check.nonEmpty then
-              val label2 = new Label(check)
-              vbox.getChildren.add(label2)
-            allEventChildren = allEventChildren.appended(vbox)
+              label.setText(days(i) + "   " + check)
+            else
+              label.setText(days(i))
+            allEventChildren = allEventChildren.appended(label)
 
-            gridpane.add(vbox,i+1,0)
-            //allEventChildren = allEventChildren.appended(vbox)
+            gridpane.add(label,i+1,0)
 
         putWeekdaysAndHolidays
 
@@ -224,7 +237,6 @@ object Weekly_view extends JFXApp3:
         // set up time slots
         var clock = 0.00
         //Time slots will be set to 60 mins. So rowsHeightPercetage will be 100 / (24) on default
-        val rowsHeightPercentage = 100 / 24
         //HEIGHT
         for i <- 0 until(24) do
             val row = new RowConstraints()
