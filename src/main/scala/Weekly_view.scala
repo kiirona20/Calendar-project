@@ -97,7 +97,6 @@ object Weekly_view extends JFXApp3:
          rowSpanMinute = 1
        //how many cells does the event occupy
        val eventRowSpan = hourEnd - hourStart + rowSpanMinute
-       println("THis is hourEnd" + hourEnd)
 
        // Create a stack pane for the event
 
@@ -131,7 +130,6 @@ object Weekly_view extends JFXApp3:
        //
               // Set the row span for the stack in the grid
        GridPane.setRowSpan(stack, eventRowSpan)
-       println("row constraints" + gridpane.getRowConstraints)
 
             // Move to the next day
      currentDate = currentDate.plusDays(1)
