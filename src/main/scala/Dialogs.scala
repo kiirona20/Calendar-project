@@ -147,8 +147,8 @@ object Dialogs {
           val alarmDateTIme: Option[String] = if alarDate.nonEmpty && alarTime.nonEmpty then Some(alarDate + alarTime) else None
 
           Events.addEventBetter(Event(generateNewUid,stDateTime,endDateTime,summary1,description1, category1, alarmDateTIme))
-          Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
+          Weekly_view.deleteEventsFromGrid(Weekly_view.gridpane)
+          //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
 
         def editEventDialog: Unit =
           val dialog = new Dialog[Unit]()
@@ -288,8 +288,8 @@ object Dialogs {
 
 
           dialog.showAndWait()
-          Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
+          Weekly_view.deleteEventsFromGrid(Weekly_view.gridpane)
+          //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
 
 
 
@@ -314,8 +314,8 @@ object Dialogs {
             val selected = listView.selectionModel.apply().getSelectedItem
             if selected != null then
               Events.deleteEvent(selected.toString)
-              Weekly_view.deleteEventsFromGrid
-              Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
+              Weekly_view.deleteEventsFromGrid(Weekly_view.gridpane)
+              //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
             listView.items = listView.items.apply().diff(Seq(selected))
 
 
@@ -347,8 +347,8 @@ object Dialogs {
           dialog.getDialogPane.setContent(grid)
           dialog.getDialogPane.getButtonTypes.addAll( ButtonType.Cancel, ButtonType.Finish)
           dialog.showAndWait()
-          Weekly_view.deleteEventsFromGrid
-          Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i)))
+          Weekly_view.deleteEventsFromGrid(Weekly_view.gridpane)
+          //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
            //Should work with this input = name,202003031700,202003031800, hopefully this works :D
        def handleCheckBox(boxes: Seq[CheckBox]) =
          var selectedList: Seq[String] = Seq[String]()
