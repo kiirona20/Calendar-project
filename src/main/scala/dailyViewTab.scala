@@ -1,4 +1,4 @@
-import Weekly_view.{dateTracker, sceneHeight, sceneWidth, setEventtoGrid, start}
+import Weekly_view.{dateTracker, sceneHeight, sceneWidth, setEventToGridWeekly, start}
 import scalafx.event.ActionEvent
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.{Button, Label, Tab, TabPane, Tooltip}
@@ -12,8 +12,6 @@ import scalafx.scene.shape.Rectangle
 import java.time.LocalTime
 
 object dailyViewTab{
-  var allEventChildren = List[Node]()
-
 
   var currentDay = Events.getDateToday
   val rowsHeightPercentage = 100 / 25
@@ -63,35 +61,34 @@ object dailyViewTab{
   gridPane.add(button1, 0, 0)
 
 
-
-  val day = new Label(currentDay.getDayOfWeek.toString)
+  //FindHoliday in case the publicholiday is on the same day you open the calendar
+  val day = new Label(currentDay.getDayOfWeek.toString + "  " + publIcHolidays.findHoliday(Events.getDateOnly(currentDay)))
   gridPane.add(day,1,0)
   gridPane.add(button2,2,0)
 
+
   button1.onAction = (e: ActionEvent) =>
     currentDay = currentDay.minusDays(1)
-    day.text = currentDay.getDayOfWeek.toString
-    Weekly_view.deleteEventsFromGrid(gridPane)
-    //Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
-    //Weekly_view.putWeekdaysAndHolidays
+    val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
+    day.text = currentDay.getDayOfWeek.toString + "  " + holidays
+    View.deleteEventsFromGrid
+
   button2.onAction = (e: ActionEvent) =>
     currentDay = currentDay.plusDays(1)
-    day.text = currentDay.getDayOfWeek.toString
-    Weekly_view.deleteEventsFromGrid(gridPane)
-    //Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
-    //Weekly_view.putWeekdaysAndHolidays
+    val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
+    day.text = currentDay.getDayOfWeek.toString + "  " + holidays
+    View.deleteEventsFromGrid
+
   Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
 
 
-
+//Same as weeklySetEventsTogrid but considers only 1 day 
   def SetEventToGridDaily(dateStart: String, dateEnd: String) =
     //Converts dateStart and dateEnd to localDateTime for making it easier to compare these dates
     var convertedDateStart = Events.convertStringToDate(dateStart)
     val convertedDateEnd = Events.convertStringToDate(dateEnd)
     //Loops through the days
     var currentDayLoop = convertedDateStart
-
-
 
     while currentDayLoop.isBefore(convertedDateEnd) || currentDayLoop.isEqual(convertedDateEnd) do
       if currentDayLoop.isEqual(currentDay) then
@@ -132,7 +129,7 @@ object dailyViewTab{
         val label = new Label(Events.getEventName(dateStart))
         stack.getChildren.addAll(rectangle, label)
 
-        Weekly_view.allEventChildren = Weekly_view.allEventChildren.appended(stack)
+        View.allEventChildren = View.allEventChildren.appended(stack)
 
         gridPane.add(stack,1,hourStart+1)
         GridPane.setRowSpan(stack,eventRowSpan)

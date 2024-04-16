@@ -7,7 +7,8 @@ object publIcHolidays {
     "1206"->"Finland’s Independence Day",
     "1225"->"Christmas Day",
     "1226"->"Boxing Day",
-    "0401"->"Test"
+    "0401"->"Test",
+    "0414"->"Test"
   )
   def findHoliday(date: String) =
     holidays.getOrElse(date,"")

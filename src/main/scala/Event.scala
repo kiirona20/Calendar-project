@@ -1,3 +1,5 @@
+import scalafx.scene.paint.Color
+
 import java.time.Duration.between
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -9,6 +11,7 @@ private var alarm: Alarm = null
 class Event(var uid: String = "", var startTime: String = "",
             var endTime: String = "", var summary: Option[String] = None,
             var description: Option[String] = None, var categories: Option[String] = None,
+            var color: Option[Color] = None,
             var trigger: Option[String] = None) {
   defineAlarm
   //Finds the value what to edit
@@ -29,7 +32,11 @@ class Event(var uid: String = "", var startTime: String = "",
         else
           defineAlarm
       case _ => println("Element not found or cannot be changed")
-
+  def changeColor(color1: Option[Color]) =
+    color = color1
+  
+  
+  
   //Checks if the alarm is defined
   def defineAlarm: Unit =
     if trigger.isDefined then

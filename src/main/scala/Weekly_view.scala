@@ -1,4 +1,4 @@
-import Weekly_view.{allEventChildren, stage}
+
 import javafx.collections.FXCollections
 import scalafx.stage.*
 import scalafx.Includes.*
@@ -32,36 +32,19 @@ import scala.concurrent.Future
 object Weekly_view extends JFXApp3:
   // Define a case class to represent a reminder
  
- var allEventChildren = List[Node]()
       // Variables for scene size
  var sceneWidth = 0.0
  var sceneHeight = 0.0
  val amountOfRows = 10
  val amountOfColumnds = 25
      // Define the days of the week
- val days = List[String]("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
     // Variables for tracking the current date and events
  var dateTracker = Events.getDateToday
  val gridpane = new GridPane
 
 
-  def putWeekdaysAndHolidays: Unit =
-    val weekDay = dateTracker.getDayOfWeek.getValue
-    val firstDayOfTheWeek = dateTracker.minusDays(weekDay)
-    //add labels for each day of the week
-    for i <- days.indices do
-      val check = publIcHolidays.findHoliday(Events.getDateOnly(firstDayOfTheWeek.plusDays(i + 1)))
-      val label = new Label()
-      if check.nonEmpty then
-        label.setText(days(i) + "   " + check)
-      else
-        label.setText(days(i))
-      allEventChildren = allEventChildren.appended(label)
-
-      gridpane.add(label, i + 1, 0)
-
   //Helper function for setting things to the grid
-  def setEventtoGrid(dateStart: String, dateEnd: String, grid: GridPane, calendarWeekly: Boolean) =
+  def setEventToGridWeekly(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
    val convertedDateStart = Events.convertStringToDate(dateStart)
    val convertedDateEnd = Events.convertStringToDate(dateEnd)
@@ -106,7 +89,7 @@ object Weekly_view extends JFXApp3:
               // Calculate total height of the event based on screen height
        val eventHeight = (endTimeRatio - startTimeRatio) * sceneHeight
               // Calculate the Y offset to position the event correctly in the grid
-       val eventOffset = if calendarWeekly then (minStart / 60) * (sceneHeight / amountOfColumnds) else (minStart / 60) * (sceneHeight / 3)
+       val eventOffset = (minStart / 60) * (sceneHeight / amountOfColumnds)
 
 
        // Calculate row span for the event
@@ -121,7 +104,7 @@ object Weekly_view extends JFXApp3:
        val stack = new StackPane()
        val rectangle = new Rectangle()
        //Sets width depending on is it daily- or weeklyview
-       rectangle.width = if calendarWeekly then sceneWidth/amountOfRows-10 else sceneWidth/1.25-10
+       rectangle.width = sceneWidth/amountOfRows-10
 
        rectangle.height = eventHeight
        rectangle.fill = Color.Green
@@ -141,13 +124,11 @@ object Weekly_view extends JFXApp3:
        stack.getChildren.addAll(rectangle, label)
               // Add the stack to the list of all events
 
-       allEventChildren = allEventChildren.appended(stack)
+       View.allEventChildren = View.allEventChildren.appended(stack)
        //println("All event children:" + allEventChildren)
               // Add the stack to the grid
-       if !calendarWeekly && dailyViewTab.currentDay.getDayOfWeek == convertedDateStart.getDayOfWeek then
-        grid.add(stack, 1, hourStart+1)
-       else
-        grid.add(stack, x, hourStart+1)
+
+       gridpane.add(stack, x, hourStart+1)
 
 
        //
@@ -157,31 +138,7 @@ object Weekly_view extends JFXApp3:
             // Move to the next day
      currentDate = currentDate.plusDays(1)
 
-
-
-
- def deleteEventsFromGrid(grid: GridPane): Unit =
-          // Remove all events from the grid
-   //println("first gridpane children before operation:"+gridpane.children)
-
-   allEventChildren.foreach((i)=> gridpane.children -= i)
-   //allEventChildren.foreach((i)=> dailyViewTab.gridPane.children -= i)
-
-   allEventChildren.foreach((i)=> dailyViewTab.gridPane.children -= i)
-
-   //println("Second gridpane children:" + dailyViewTab.gridPane.children)
-
-          // Empty the list of all events
-   allEventChildren = allEventChildren.empty
-   //println("After emptying:" + allEventChildren)
-
-        // Add all events to the grid
-   Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i), gridpane, true))
-   Events.showEvents.foreach((i)=>dailyViewTab.SetEventToGridDaily(i,Events.getEventEndTime(i)))
-   putWeekdaysAndHolidays
  private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
-
-
 
   // Define a start function to set up a weekly calendar
 
@@ -203,7 +160,6 @@ object Weekly_view extends JFXApp3:
         tab2.setText("DailyView")
 
         //Creates a gridpane layout.
-        // Enable grid lines for debugging purposes
         gridpane.gridLinesVisible = true
 
         //Column width persentage set to 100/10 (7 days + time column + buttons)
@@ -229,22 +185,8 @@ object Weekly_view extends JFXApp3:
 
 
 
-        putWeekdaysAndHolidays
+        View.putWeekdaysAndHolidays
 
-       /** val weekDay = dateTracker.getDayOfWeek.getValue
-        val firstDayOfTheWeek = dateTracker.minusDays(weekDay)
-        //add labels for each day of the week
-        for i <- days.indices do
-          val check = publIcHolidays.findHoliday(Events.getDateOnly(firstDayOfTheWeek.plusDays(i+1)))
-          val vbox = new VBox()
-          val label = new Label(days(i))
-          vbox.getChildren.add(label)
-
-          if check.nonEmpty then
-            val label2 = new Label(check)
-            vbox.getChildren.add(label2)
-          gridpane.add(vbox,i+1,0)
-*/
 
         //add buttons to move between weeks
         val button1 = new Button("<--")
@@ -256,14 +198,14 @@ object Weekly_view extends JFXApp3:
         button1.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.minusWeeks(1)
           date.text = dateTracker.toString
-          deleteEventsFromGrid(gridpane)
+          View.deleteEventsFromGrid
           //Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i), gridpane, true))
           //putWeekdaysAndHolidays
         }
         button2.onAction = (e: ActionEvent) => {
           dateTracker = dateTracker.plusWeeks(1)
           date.text = dateTracker.toString
-          deleteEventsFromGrid(gridpane)
+          View.deleteEventsFromGrid
           //Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i), gridpane, true))
           //putWeekdaysAndHolidays
 
@@ -300,7 +242,7 @@ object Weekly_view extends JFXApp3:
           if me.button == MouseButton.Secondary then
             contextmenu.show(this.window(),me.screenX,me.screenY)
         //set Events to grid
-        Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i), gridpane, true))
+        Events.showEvents.foreach((i)=>setEventToGridWeekly(i,Events.getEventEndTime(i)))
         tabPane.tabs = List(tab1,tab2)
         root = tabPane
 

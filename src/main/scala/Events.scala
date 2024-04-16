@@ -50,6 +50,7 @@ object Events {
       linestoedit(i).summary.map((j)=>"SUMMARY:" + j + "\n").getOrElse(""),
       linestoedit(i).description.map((j)=>"DESCRIPTION:" + j + "\n").getOrElse(""),
       linestoedit(i).categories.map((j)=>"CATEGORIES:" + j + "\n").getOrElse(""),
+      linestoedit(i).color.map((j)=>"Color:" + j + "\n").getOrElse(""),
       linestoedit(i).trigger.map((j)=>"BEGIN:VALARM\nACTION:AUDIO\nTRIGGER:" + j.patch(8,"T",0) + "\nEND:VALARM\n").getOrElse(""),
       "END:VEVENT\n",
       if i+1 == linestoedit.length then "END:VCALENDAR" else ""
@@ -121,6 +122,9 @@ object Events {
         case sisalto if sisalto.startsWith("CATEGORIES:") => storedData += "categories detected"
           baseEvent.categories = (Some(currentLine.drop(11)))
           lineReader.readLine()
+        case sisalto if sisalto.startsWith("Color:") => storedData += "color detected"
+          baseEvent.description = Some(currentLine.drop(12))
+          lineReader.readLine()
         case sisalto if sisalto.startsWith("TRIGGER:") => storedData += "trigger detected"
           baseEvent.trigger = (Some(currentLine.slice(8,16) + currentLine.slice(17,23)))
           lineReader.readLine()
@@ -190,12 +194,13 @@ object Events {
   //Filters all the None categories
   def allCategories =
     groupedByCategories.keys
-    
+  
+  def showAllEvents = readFileBetter.keys
 
   def showEvents =
     if calendarState.appliedFilter.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys)
     else
-      readFileBetter.keys
+      showAllEvents
 
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
