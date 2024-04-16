@@ -6,6 +6,7 @@ import scalafx.scene.layout.GridPane.{getColumnSpan, setColumnSpan, setConstrain
 import scalafx.scene.layout.{ColumnConstraints, GridPane, RowConstraints, StackPane}
 import scalafx.Includes.*
 import scalafx.geometry.Pos
+import scalafx.scene.input.MouseDragEvent
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
@@ -79,6 +80,8 @@ object dailyViewTab{
     day.text = currentDay.getDayOfWeek.toString + "  " + holidays
     View.deleteEventsFromGrid
 
+  println(gridPane.children)
+
   Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
 
 
@@ -123,7 +126,7 @@ object dailyViewTab{
 
         rectangle.width = sceneWidth/1.25-10
         rectangle.height = eventHeight
-        rectangle.fill = Color.Aqua
+        rectangle.fill = Events.getEventColor(dateStart)
         stack.setAlignment(Pos.TopLeft)
         stack.setTranslateY(eventOffset)
         val label = new Label(Events.getEventName(dateStart))
@@ -135,6 +138,10 @@ object dailyViewTab{
         GridPane.setRowSpan(stack,eventRowSpan)
 
       currentDayLoop = currentDayLoop.plusDays(1)
+
+
+
+
 
 
 

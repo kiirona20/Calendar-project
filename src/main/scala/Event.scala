@@ -34,7 +34,7 @@ class Event(var uid: String = "", var startTime: String = "",
       case _ => println("Element not found or cannot be changed")
   def changeColor(color1: Option[Color]) =
     color = color1
-  
+    println(color)
   
   
   //Checks if the alarm is defined

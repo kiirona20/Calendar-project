@@ -1,4 +1,6 @@
 
+import scalafx.scene.paint.Color
+
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter, IOException, PrintWriter, StreamCorruptedException}
 import java.time.{LocalDateTime, LocalTime}
 import java.util.UUID
@@ -66,7 +68,7 @@ object Events {
 
   //readFile voidaan refraktoroida paremmaksi tekemällä match case tilanne
   def readFileBetter: Map[String,Event] =
-    var storedData = ""
+
     var storedEventsBetter: Map[String,Event] = Map()
 
     val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
@@ -109,26 +111,27 @@ object Events {
           startDateTime = true
           baseEvent.startTime = currentLine.slice(8,16) + currentLine.slice(17,23)
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("DTEND:") => storedData += "dtend detected"
+        case sisalto if sisalto.startsWith("DTEND:") =>
           endDateTime = true
           baseEvent.endTime = currentLine.slice(6,14) + currentLine.slice(15,21)
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("SUMMARY:") => storedData += "summary detected"
+        case sisalto if sisalto.startsWith("SUMMARY:") =>
           baseEvent.summary = Some(currentLine.drop(8))
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("DESCRIPTION:") => storedData += "description detected"
+        case sisalto if sisalto.startsWith("DESCRIPTION:") =>
           baseEvent.description = Some(currentLine.drop(12))
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("CATEGORIES:") => storedData += "categories detected"
+        case sisalto if sisalto.startsWith("CATEGORIES:") =>
           baseEvent.categories = (Some(currentLine.drop(11)))
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("Color:") => storedData += "color detected"
-          baseEvent.description = Some(currentLine.drop(12))
+        case sisalto if sisalto.startsWith("Color:") =>
+          //Drops Color: part and [SFX] part from the file
+          baseEvent.color = Some(Color.valueOf(currentLine.drop(11)))
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("TRIGGER:") => storedData += "trigger detected"
+        case sisalto if sisalto.startsWith("TRIGGER:") =>
           baseEvent.trigger = (Some(currentLine.slice(8,16) + currentLine.slice(17,23)))
           lineReader.readLine()
-        case sisalto if sisalto.startsWith("END:VEVENT") => storedData += "Laita asiat pakettiin"
+        case sisalto if sisalto.startsWith("END:VEVENT") =>
           endV = true
           lineReader.readLine()
         case _ => lineReader.readLine()
@@ -196,6 +199,9 @@ object Events {
     groupedByCategories.keys
   
   def showAllEvents = readFileBetter.keys
+
+  def getEventColor(key: String): Color =
+    readFileBetter(key).color.getOrElse(Color.Aqua)
 
   def showEvents =
     if calendarState.appliedFilter.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys)

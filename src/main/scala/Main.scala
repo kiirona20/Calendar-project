@@ -2,6 +2,7 @@
 import Events.{getDateOnly, getDateToday, getdayOfWeek, groupedByCategories}
 import Weekly_view.dateTracker
 import akka.actor.{ActorSystem, Props}
+import scalafx.scene.paint.Color
 
 import java.time.LocalDateTime
 import scala.io.StdIn.*
@@ -18,8 +19,8 @@ object Main extends App {
   val event13 = Event( "jotain2", "20240323160000","20240323190000", None, None, None, None)
   val event14 = Event( "jotain1", "20240324160000","20240322190000", Some("lol"), Some("mörkö"), Some("tapaaminen"),None, Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.minusSeconds(10))))
   val testFilter = Seq("tapaaminen")
-  val event15 = Event( "mopo", "20240424160000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), None)
-  val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), None,Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(15))))
+  val event15 = Event( "mopo", "20240424160000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Color.Green))
+  val eventAlarm = Event("mopo", "20240424162000","20240422190000", Some("mopo"), Some("mopo"), Some("mopo"), Some(Color.Green),Some(Events.convertLocalDateTimeToFormat(LocalDateTime.now.plusSeconds(15))))
 
 
 //@main
@@ -51,7 +52,8 @@ object Main extends App {
     
 
 @main
-  def testAdding = Events.addEventBetter(event15)// start time should be unique
+  def testAdding = Events.addEventBetter(eventAlarm)
+  println(eventAlarm.color)// start time should be unique
 
 @main
   def testIcalendar =

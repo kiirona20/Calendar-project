@@ -11,6 +11,7 @@ import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.input.KeyCode.N
 import scalafx.scene.layout.GridPane
+import scalafx.scene.paint.Color
 import scalafx.stage.Stage.sfxStage2jfx
 
 import java.time.format.DateTimeFormatter
@@ -19,7 +20,7 @@ import java.util.UUID
 
 object Dialogs {
   //Result class to store are dialog values
-  case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, alarmDate: String, alarmTime: String)
+  case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, color: Color, alarmDate: String, alarmTime: String)
   private val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
   // Function to display a dialog for adding a new even
   def EventInputDialog(): Unit =
@@ -57,8 +58,11 @@ object Dialogs {
     val descriptionLabel = new Label("Description:")
     val descriptionInput = new TextField()
 
-    val categoryLabel = new Label("Category: COMING SOONG :D")
+    val categoryLabel = new Label("Category:")
     val categoryInput = new TextField()
+
+    val colorLabel = new Label("Color of the event:")
+    val colorpicker = new ColorPicker()
 
     // Create input fields for alarm date and time
     val alarmdateLabel = new Label("Alarm date")
@@ -67,7 +71,6 @@ object Dialogs {
     val alarmtimeLabel = new Label("Alarm time")
     val alarmtimeInput = new TextField()
 
-    val colorpicker = new ColorPicker()
 
     //add stuff to grid
     val grid = new GridPane()
@@ -90,13 +93,17 @@ object Dialogs {
     grid.add(categoryLabel, 1, 7)
     grid.add(categoryInput, 2, 7)
 
-    grid.add(alarmdateLabel, 1, 8)
-    grid.add(alarmdateInput, 2, 8)
+    grid.add(colorLabel,1,8)
+    grid.add(colorpicker,2,8)
 
-    grid.add(alarmtimeLabel, 1, 9)
-    grid.add(alarmtimeInput, 2, 9)
 
-    grid.add(colorpicker,1,10)
+    grid.add(alarmdateLabel, 1, 9)
+    grid.add(alarmdateInput, 2, 9)
+
+    grid.add(alarmtimeLabel, 1, 10)
+    grid.add(alarmtimeInput, 2, 10)
+
+
 
     dialog.getDialogPane.setContent(grid)
 
@@ -116,6 +123,7 @@ object Dialogs {
           startDateInput.getValue.toString, startTimeInput.getText,
           endDateInput.getValue.toString, endTimeInput.getText,
           descriptionInput.getText, categoryInput.getText,
+          colorpicker.getValue,
           if alarmdateInput.getValue != null then alarmdateInput.getValue.toString else "", alarmtimeInput.getText)
       else
         null
@@ -123,16 +131,16 @@ object Dialogs {
     val result = dialog.showAndWait()
 
     result match {
-      case Some(Result(n, s1, s2, e1, e2, d, c, a1, a2)) => println("name=" + n + "\nstartDate="
+      case Some(Result(n, s1, s2, e1, e2, d, c,c2, a1, a2)) => println("name=" + n + "\nstartDate="
         + s1 + ", startTime=" + s2 + "\nendDate=" + e1 + ", endTime=" + e2 +
-        "\ndescription=" + d +
+        "\ndescription=" + d + "Color" + c2 +
         "\nalarmDate=" + a1 + "  alarmTime=" + a2)
-        userInput(n, s1, s2, e1, e2, d, c, a1, a2)
+        userInput(n, s1, s2, e1, e2, d, c,c2, a1, a2)
       case Some(_) => println("ErROR :DD")
       case None => println("Dialog returned: None")
     }
 
-  def userInput(summary: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, category: String, alarmDate: String, alarmTime: String) =
+  def userInput(summary: String, dateStart: String, timeStart: String, dateEnd: String, timeEnd: String, description: String, category: String, color: Color, alarmDate: String, alarmTime: String) =
     //val category: Option[String] = if description.nonEmpty then Some(category) else None
     //val categories = None
     val stDate: String = dateStart.replace("-", "")
@@ -144,13 +152,15 @@ object Dialogs {
     val alarDate = if alarmDate.nonEmpty then alarmDate.replace("-", "") else ""
     val alarTime = if alarmTime.nonEmpty then alarmTime.replace(":", "") else ""
     val category1 = if category.nonEmpty then Some(category) else None
+
     val summary1 = if summary.isEmpty then None else Some(summary)
     val description1 = if description.isEmpty then None else Some(description)
     val alarmDateTIme: Option[String] = if alarDate.nonEmpty && alarTime.nonEmpty then Some(alarDate + alarTime) else None
-
-    Events.addEventBetter(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, None, alarmDateTIme))
+    val event = Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme)
+    Events.addEventBetter(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme))
     View.deleteEventsFromGrid
-  //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
+    println(event.color)
+    println(event.description)
 
   def editEventDialog: Unit =
     val dialog = new Dialog[Unit]()
@@ -299,7 +309,7 @@ object Dialogs {
     dialog.setTitle("Delete event")
     dialog.setHeaderText("Click on Events you wish to delete and then press Delete Button")
 
-    val listView = new ListView(Events.showEvents.toList)
+    val listView = new ListView(Events.showAllEvents.toList.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
     listView.prefHeight = 200
     listView.prefWidth = 200
 
@@ -313,7 +323,7 @@ object Dialogs {
     deleteButton.onAction = (e: ActionEvent) =>
       val selected = listView.selectionModel.apply().getSelectedItem
       if selected != null then
-        Events.deleteEvent(selected.toString)
+        Events.deleteEvent(selected.slice(0,14))
         View.deleteEventsFromGrid
       //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
       listView.items = listView.items.apply().diff(Seq(selected))

@@ -107,7 +107,7 @@ object Weekly_view extends JFXApp3:
        rectangle.width = sceneWidth/amountOfRows-10
 
        rectangle.height = eventHeight
-       rectangle.fill = Color.Green
+       rectangle.fill = Events.getEventColor(dateStart)
               // Align the stack and shift it down
        stack.setAlignment(Pos.TopLeft)
        stack.setTranslateY(eventOffset)
@@ -199,6 +199,7 @@ object Weekly_view extends JFXApp3:
           dateTracker = dateTracker.minusWeeks(1)
           date.text = dateTracker.toString
           View.deleteEventsFromGrid
+          
           //Events.showEvents.foreach((i)=>setEventtoGrid(i,Events.getEventEndTime(i), gridpane, true))
           //putWeekdaysAndHolidays
         }
