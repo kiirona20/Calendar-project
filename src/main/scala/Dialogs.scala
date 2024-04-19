@@ -1,4 +1,6 @@
+import Events.allCategories
 import Weekly_view.{gridpane, setEventToGridWeekly}
+import javafx.scene.layout.VBox
 import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx}
 import scalafx.beans.property.BooleanProperty
 import scalafx.Includes.*
@@ -23,11 +25,16 @@ object Dialogs {
   case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, color: Color, alarmDate: String, alarmTime: String)
   private val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
   // Function to display a dialog for adding a new even
-  def EventInputDialog(): Unit =
+  def EventInputDialog: Unit =
     // Create a new dialog for adding events
     val dialog = new Dialog[Result]()
     dialog.setTitle("Add Event")
     dialog.setHeaderText("Enter event details")
+    val startDateText = if dailyViewTab.dragInputCheck then dailyViewTab.currentDay else LocalDate.now
+    val startTimeText = if dailyViewTab.dragInputCheck then dailyViewTab.startTime else null
+    val endDateText = if dailyViewTab.dragInputCheck then dailyViewTab.currentDay else LocalDate.now
+    val endTimeText = if dailyViewTab.dragInputCheck then dailyViewTab.endTime else null
+
 
     // Define the format for the time fields
     val timePattern = "HH:mm:ss"
@@ -36,21 +43,23 @@ object Dialogs {
     val nameLabel = new Label("Event Name:")
     val nameInput = new TextField()
     val startDateLabel = new Label("Start Date:")
-    val startDateInput = new DatePicker(LocalDate.now)
+    val startDateInput = new DatePicker(startDateText)
     val startTimeLable = new Label("Start Time:")
     val startTimeInput = new TextField()
+    startTimeInput.text = startTimeText
     // Set the format for the start time field
     startTimeInput.promptText = "Put time in format HH:mm:ss"
 
     // Disable editing of the date fields
     startDateInput.getEditor.setDisable(true)
     val endDateLabel = new Label("End Date:")
-    val endDateInput = new DatePicker(LocalDate.now)
+    val endDateInput = new DatePicker(endDateText)
     endDateInput.getEditor.setDisable(true)
 
     // Create end time field
     val endTimeLable = new Label("End Time:")
     val endTimeInput = new TextField()
+    endTimeInput.text = endTimeText
     // Set the format for the end time field
     endTimeInput.promptText = "Put time in format HH:mm:ss"
 
@@ -172,15 +181,25 @@ object Dialogs {
     listView.prefHeight = 200
     listView.prefWidth = 200
     val grid = new GridPane()
+    val checkboxes = allCategories.map((i) => new CheckBox(i.get)).toSeq
+    val vBox = VBox()
+    val filterLabel = new Label("Filter list by categories")
+    val filterButton = new Button("Filter")
+    vBox.getChildren.add(filterLabel)
+    checkboxes.foreach((i)=>vBox.getChildren.add(i))
+
+
     grid.add(listView, 1, 1)
+    grid.add(vBox,2,1)
     dialog.getDialogPane.setContent(grid)
     val editButton = new Button("Edit")
     grid.add(editButton, 1, 2)
+    grid.add(filterButton,2,2)
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel, ButtonType.Finish)
     editButton.onAction = (e: ActionEvent) =>
       val selected = listView.selectionModel.apply().getSelectedItem.slice(0,14)
       if selected != null then
-        println(selected)
+
 
         processEditDialog(selected.toString)
     dialog.showAndWait()
@@ -335,7 +354,7 @@ object Dialogs {
   def categoriesDialog: Unit =
     val dialog = new Dialog[Unit]()
     dialog.setTitle("Categories")
-    dialog.setHeaderText("Here you can edit categories and view events by categories.")
+    dialog.setHeaderText("Here you can filter events by categories.")
     val button = new Button("filter")
     //
     // List of all categories
@@ -357,8 +376,7 @@ object Dialogs {
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel, ButtonType.Finish)
     dialog.showAndWait()
     View.deleteEventsFromGrid
-          //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
-           //Should work with this input = name,202003031700,202003031800, hopefully this works :D
+
   def handleCheckBox(boxes: Seq[CheckBox]) =
     var selectedList: Seq[String] = Seq[String]()
     for i <- boxes.indices do

@@ -1,4 +1,6 @@
-import Weekly_view.{dateTracker, sceneHeight, sceneWidth, setEventToGridWeekly, start}
+import Weekly_view.{dateTracker, gridpane, sceneHeight, sceneWidth, setEventToGridWeekly, start}
+import javafx.geometry.HPos
+import scalafx.scene.input.MouseButton
 import scalafx.event.ActionEvent
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.{Button, Label, Tab, TabPane, Tooltip}
@@ -6,14 +8,16 @@ import scalafx.scene.layout.GridPane.{getColumnSpan, setColumnSpan, setConstrain
 import scalafx.scene.layout.{ColumnConstraints, GridPane, RowConstraints, StackPane}
 import scalafx.Includes.*
 import scalafx.geometry.Pos
-import scalafx.scene.input.MouseDragEvent
+import scalafx.scene.input.{MouseDragEvent, MouseEvent}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
+import scala.math.{max, min}
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 object dailyViewTab{
-
+  var dragInputCheck = false
   var currentDay = Events.getDateToday
   val rowsHeightPercentage = 100 / 25
   //width set 1 day + 2 buttons
@@ -22,6 +26,8 @@ object dailyViewTab{
   val columnWidthPercentage = 80
   val columnWidthforButtons = 10
   var clock = 0.00
+  private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
+
 
   val gridPane = new GridPane
   for i <- 0 until (25) do
@@ -63,7 +69,7 @@ object dailyViewTab{
 
 
   //FindHoliday in case the publicholiday is on the same day you open the calendar
-  val day = new Label(currentDay.getDayOfWeek.toString + "  " + publIcHolidays.findHoliday(Events.getDateOnly(currentDay)))
+  val day = new Label(currentDay.getDayOfWeek.toString + "  " + publIcHolidays.findHoliday(Events.getDateOnly(currentDay)) + "  " + currentDay)
   gridPane.add(day,1,0)
   gridPane.add(button2,2,0)
 
@@ -71,22 +77,53 @@ object dailyViewTab{
   button1.onAction = (e: ActionEvent) =>
     currentDay = currentDay.minusDays(1)
     val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
-    day.text = currentDay.getDayOfWeek.toString + "  " + holidays
+    day.text = currentDay.getDayOfWeek.toString + "  " + holidays + "  " + currentDay
     View.deleteEventsFromGrid
 
   button2.onAction = (e: ActionEvent) =>
     currentDay = currentDay.plusDays(1)
     val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
-    day.text = currentDay.getDayOfWeek.toString + "  " + holidays
+    day.text = currentDay.getDayOfWeek.toString + "  " + holidays+ "  " + currentDay
     View.deleteEventsFromGrid
 
-  println(gridPane.children)
+  var startMousePressed = 0.0
+  var endMouseReleased = 0.0
+  gridPane.onMousePressed = (e:MouseEvent) =>
+    if e.button == MouseButton.Primary then
+      startMousePressed = e.getY
 
+  gridPane.onMouseReleased = (e: MouseEvent) =>
+    if e.button == MouseButton.Primary then
+      endMouseReleased = e.getY
+      dragInputCheck = true
+
+      dragCalculateTime
+      dragInputCheck = false
+
+  var startTime:String = ""
+  var endTime:String = ""
+  def dragCalculateTime =
+    val oneRowHeight = sceneHeight/24
+    //-1 beacause there are 25 collumns
+    val startTimeHour = ((min(startMousePressed,endMouseReleased)/oneRowHeight).floor-1).toInt
+    val endTimeHour = ((max(startMousePressed,endMouseReleased)/oneRowHeight).floor-1).toInt
+
+    val startTimeMinute = (min(startMousePressed,endMouseReleased)%oneRowHeight)/oneRowHeight*60
+    val endTimeMinute = (max(endMouseReleased,startMousePressed)%oneRowHeight)/oneRowHeight*60
+    println("Event StartTime: Hour: " + startTimeHour + "Mins:" + startTimeMinute + "Event EndTime: hour: " + endTimeHour + "mins" + endTimeMinute)
+    if startTimeHour < 0 then println("event starting time has to start form 0.0")
+    else
+      startTime = LocalTime.of(startTimeHour.toInt, startTimeMinute.toInt, 0).format(timeFormat)
+      endTime = LocalTime.of(endTimeHour, endTimeMinute.toInt, 0).format(timeFormat)
+      Dialogs.EventInputDialog
   Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
+
 
 
 //Same as weeklySetEventsTogrid but considers only 1 day 
   def SetEventToGridDaily(dateStart: String, dateEnd: String) =
+    //println("Grid daily dateStart:" + Events.convertStringToDateTIme(dateStart))
+    //println("Grid daily dateEnd:" + Events.convertStringToDateTIme(dateEnd))
     //Converts dateStart and dateEnd to localDateTime for making it easier to compare these dates
     var convertedDateStart = Events.convertStringToDate(dateStart)
     val convertedDateEnd = Events.convertStringToDate(dateEnd)
@@ -112,7 +149,7 @@ object dailyViewTab{
         val startTimeRatio = (hourStart+minuteStart/60)/24
         val endTimeRatio = (hourEnd+minuteENd/60)/24
         val eventHeight = (endTimeRatio-startTimeRatio)*sceneHeight
-        val eventOffset = (minuteStart / 60) * (sceneHeight / 3)
+        val eventOffset = (minuteStart / 60) * (sceneHeight / Weekly_view.amountOfColumnds)
 
 
         var rowSpanMinute = 0

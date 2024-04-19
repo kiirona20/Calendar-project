@@ -46,6 +46,10 @@ object Weekly_view extends JFXApp3:
   //Helper function for setting things to the grid
   def setEventToGridWeekly(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
+
+   println("Grid Weekly dateStart:" + Events.convertStringToDate(dateStart))
+   println("Grid Weekly dateStart:" + Events.convertStringToDate(dateEnd))
+
    val convertedDateStart = Events.convertStringToDate(dateStart)
    val convertedDateEnd = Events.convertStringToDate(dateEnd)
           // Get the weekday of the current date
@@ -129,6 +133,8 @@ object Weekly_view extends JFXApp3:
               // Add the stack to the grid
 
        gridpane.add(stack, x, hourStart+1)
+
+
 
 
        //
@@ -230,7 +236,7 @@ object Weekly_view extends JFXApp3:
 
 
         val contextmenu = new ContextMenu()
-        contextmenu.items.add((new MenuItem("Add events"){onAction = () => Dialogs.EventInputDialog()}))//deleteEventsFromGrid(gridpane)
+        contextmenu.items.add((new MenuItem("Add events"){onAction = () => Dialogs.EventInputDialog}))//deleteEventsFromGrid(gridpane)
         contextmenu.items.add((new MenuItem("Edit events"){onAction = () => Dialogs.editEventDialog}))
         contextmenu.items.add((new MenuItem("Delete events"){onAction = () => Dialogs.deleteDialog}))
         contextmenu.items.add(new MenuItem("Filter events"){onAction = () => Dialogs.categoriesDialog})
@@ -238,7 +244,6 @@ object Weekly_view extends JFXApp3:
 
         tab1.content = gridpane
         tab2.content = dailyViewTab.gridPane
-
         tabPane.onMouseClicked = (me: MouseEvent) =>
           if me.button == MouseButton.Secondary then
             contextmenu.show(this.window(),me.screenX,me.screenY)

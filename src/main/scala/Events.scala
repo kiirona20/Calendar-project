@@ -210,7 +210,6 @@ object Events {
 
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
-  private val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
   private val dayMonthFormat = DateTimeFormatter.ofPattern("MMdd")
 
   def getdayOfWeek(date: String): Int =
