@@ -47,9 +47,6 @@ object Weekly_view extends JFXApp3:
   def setEventToGridWeekly(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
 
-   println("Grid Weekly dateStart:" + Events.convertStringToDate(dateStart))
-   println("Grid Weekly dateStart:" + Events.convertStringToDate(dateEnd))
-
    val convertedDateStart = Events.convertStringToDate(dateStart)
    val convertedDateEnd = Events.convertStringToDate(dateEnd)
           // Get the weekday of the current date

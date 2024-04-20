@@ -176,7 +176,7 @@ object Dialogs {
     dialog.setTitle("Edit event")
     dialog.setHeaderText("Click on the event you wish to edit and press edit Button")
 
-    val listView = new ListView(Events.showAllEvents.toList.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
+    var listView = new ListView(Events.showEventsEditDialog.toList.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
 
     listView.prefHeight = 200
     listView.prefWidth = 200
@@ -192,6 +192,9 @@ object Dialogs {
     grid.add(listView, 1, 1)
     grid.add(vBox,2,1)
     dialog.getDialogPane.setContent(grid)
+    filterButton.onAction = (e:ActionEvent) =>
+      handleCheckBox(checkboxes, true)
+      //listView.items = (Events.showEventsEditDialog.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
     val editButton = new Button("Edit")
     grid.add(editButton, 1, 2)
     grid.add(filterButton,2,2)
@@ -367,7 +370,7 @@ object Dialogs {
     ).toSeq
 
     button.onAction = (e: ActionEvent) =>
-      handleCheckBox(checkboxes)
+      handleCheckBox(checkboxes,false)
     val grid = new GridPane()
     for i <- checkboxes.indices do
       grid.add(checkboxes(i), i, 0)
@@ -377,12 +380,15 @@ object Dialogs {
     dialog.showAndWait()
     View.deleteEventsFromGrid
 
-  def handleCheckBox(boxes: Seq[CheckBox]) =
+  def handleCheckBox(boxes: Seq[CheckBox], filterList: Boolean) =
     var selectedList: Seq[String] = Seq[String]()
     for i <- boxes.indices do
       if boxes(i).isSelected then
         selectedList = selectedList :+ boxes(i).getText
-    calendarState.appliedFilters(selectedList)
+    if filterList then
+      calendarState.appliedFiltersDialog(selectedList)
+    else
+      calendarState.appliedFilters(selectedList)
 
 
 
