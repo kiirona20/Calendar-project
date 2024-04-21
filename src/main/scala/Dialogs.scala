@@ -182,11 +182,14 @@ object Dialogs {
     listView.prefWidth = 200
     val grid = new GridPane()
     val checkboxes = allCategories.map((i) => new CheckBox(i.get)).toSeq
+    //Keeps the boxes checked if they are registered in calendarState.
+    checkboxes.foreach((i)=>if calendarState.appliedFilter2.contains(i.getText) then i.selected = true)
     val vBox = VBox()
     val filterLabel = new Label("Filter list by categories")
     val filterButton = new Button("Filter")
     vBox.getChildren.add(filterLabel)
     checkboxes.foreach((i)=>vBox.getChildren.add(i))
+    
 
 
     grid.add(listView, 1, 1)
@@ -194,7 +197,7 @@ object Dialogs {
     dialog.getDialogPane.setContent(grid)
     filterButton.onAction = (e:ActionEvent) =>
       handleCheckBox(checkboxes, true)
-      //listView.items = (Events.showEventsEditDialog.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
+      listView.items = listView.items.apply().empty.addAll(Events.showEventsEditDialog.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
     val editButton = new Button("Edit")
     grid.add(editButton, 1, 2)
     grid.add(filterButton,2,2)
@@ -368,9 +371,12 @@ object Dialogs {
     val checkboxes = allCategories.map((i) =>
       new CheckBox(i.get)
     ).toSeq
+    
+    checkboxes.foreach((i)=>if calendarState.appliedFilter.contains(i.getText) then i.selected = true)
 
     button.onAction = (e: ActionEvent) =>
       handleCheckBox(checkboxes,false)
+      View.deleteEventsFromGrid
     val grid = new GridPane()
     for i <- checkboxes.indices do
       grid.add(checkboxes(i), i, 0)
@@ -378,7 +384,6 @@ object Dialogs {
     dialog.getDialogPane.setContent(grid)
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel, ButtonType.Finish)
     dialog.showAndWait()
-    View.deleteEventsFromGrid
 
   def handleCheckBox(boxes: Seq[CheckBox], filterList: Boolean) =
     var selectedList: Seq[String] = Seq[String]()
@@ -387,6 +392,7 @@ object Dialogs {
         selectedList = selectedList :+ boxes(i).getText
     if filterList then
       calendarState.appliedFiltersDialog(selectedList)
+      
     else
       calendarState.appliedFilters(selectedList)
 

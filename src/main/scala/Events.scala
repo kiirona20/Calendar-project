@@ -149,7 +149,6 @@ object Events {
 
     storedEventsBetter
 
-  //toimii kai
   def addEventBetter(userInput: Event): Unit =
     val existingEvents = readFileBetter
     val updatedEvents = existingEvents.values.toSeq :+ userInput
@@ -189,7 +188,7 @@ object Events {
     readFileBetter(key).categories.getOrElse("")
   def getAlarm(key: String): String =
     readFileBetter(key).trigger.getOrElse("")
-    
+
 
 
   def groupedByCategories =
@@ -209,7 +208,8 @@ object Events {
       showAllEvents
   def showEventsEditDialog =
     if calendarState.appliedFilter2.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter2.contains(i._1.get)).values.flatMap((i) => i.keys)
-    else showAllEvents
+    else
+      showAllEvents
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
   private val dateFormat2 = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
   private val dayMonthFormat = DateTimeFormatter.ofPattern("MMdd")
