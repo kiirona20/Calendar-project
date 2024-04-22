@@ -40,7 +40,7 @@ class Event(var uid: String = "", var startTime: String = "",
   //Checks if the alarm is defined
   def defineAlarm: Unit =
     if trigger.isDefined then
-      val triggerTime = Events.convertStringToDateTIme(trigger.get)
+      val triggerTime = dateTimeHandler.convertStringToDateTIme(trigger.get)
       //Calculates the between time Using java.Time library
       val javaDuration = between(LocalDateTime.now(), triggerTime)
       //Converts it to scala finiteDuration type

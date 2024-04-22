@@ -1,4 +1,4 @@
-import Events.allCategories
+import EventHandler.allCategories
 import Weekly_view.{gridpane, setEventToGridWeekly}
 import javafx.scene.layout.VBox
 import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx}
@@ -166,7 +166,7 @@ object Dialogs {
     val description1 = if description.isEmpty then None else Some(description)
     val alarmDateTIme: Option[String] = if alarDate.nonEmpty && alarTime.nonEmpty then Some(alarDate + alarTime) else None
     val event = Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme)
-    Events.addEventBetter(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme))
+    EventHandler.addEvent(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme))
     View.deleteEventsFromGrid
     println(event.color)
     println(event.description)
@@ -176,7 +176,7 @@ object Dialogs {
     dialog.setTitle("Edit event")
     dialog.setHeaderText("Click on the event you wish to edit and press edit Button")
 
-    var listView = new ListView(Events.showEventsEditDialog.toList.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
+    var listView = new ListView(EventHandler.showEventsEditDialog.toList.map((i)=>EventHandler.readFile(i).startTime +"   " + EventHandler.getEventName(i)))
 
     listView.prefHeight = 200
     listView.prefWidth = 200
@@ -197,7 +197,7 @@ object Dialogs {
     dialog.getDialogPane.setContent(grid)
     filterButton.onAction = (e:ActionEvent) =>
       handleCheckBox(checkboxes, true)
-      listView.items = listView.items.apply().empty.addAll(Events.showEventsEditDialog.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
+      listView.items = listView.items.apply().empty.addAll(EventHandler.showEventsEditDialog.map((i)=>EventHandler.readFile(i).startTime +"   " + EventHandler.getEventName(i)))
     val editButton = new Button("Edit")
     grid.add(editButton, 1, 2)
     grid.add(filterButton,2,2)
@@ -225,39 +225,39 @@ object Dialogs {
 
     val nameLabel = new Label("Event Name:")
     val nameInput = new TextField()
-    nameInput.setText(Events.getEventName(key))
+    nameInput.setText(EventHandler.getEventName(key))
     val startDateLabel = new Label("Start Date:")
-    val startDateInput = new DatePicker(Events.convertStringToDate(key))
+    val startDateInput = new DatePicker(dateTimeHandler.convertStringToDate(key))
     val startTimeLable = new Label("Start Time:")
     val startTimeInput = new TextField()
     //startTimeInput.textFormatter = new TextFormatter(timeConverter)
-    startTimeInput.setText(Events.convertStringToTime(key).format(format))
-    println("Event start time" + Events.convertStringToTime(key).format(format))
+    startTimeInput.setText(dateTimeHandler.convertStringToTime(key).format(format))
+    println("Event start time" + dateTimeHandler.convertStringToTime(key).format(format))
 
     //forces user to use specific format :D
     //startTimeInput.textFormatter = new TextFormatter(timeConverter)
     startDateInput.getEditor.setDisable(true)
     val endDateLabel = new Label("End Time:")
-    val endDateInput = new DatePicker(Events.convertStringToDate(Events.getEventEndTime(key)))
-    println("Event end Date:" + Events.getEventEndTime(key))
+    val endDateInput = new DatePicker(dateTimeHandler.convertStringToDate(EventHandler.getEventEndTime(key)))
+    println("Event end Date:" + EventHandler.getEventEndTime(key))
     endDateInput.getEditor.setDisable(true)
 
     val endTimeLable = new Label("End Time:")
     val endTimeInput = new TextField()
     //endTimeInput.textFormatter = new TextFormatter(timeConverter)
-    println("Event end time:" + Events.convertStringToTime(Events.getEventEndTime(key)).format(format))
+    println("Event end time:" + dateTimeHandler.convertStringToTime(EventHandler.getEventEndTime(key)).format(format))
 
-    endTimeInput.setText(Events.convertStringToTime(Events.getEventEndTime(key)).format(format))
+    endTimeInput.setText(dateTimeHandler.convertStringToTime(EventHandler.getEventEndTime(key)).format(format))
 
 
     val descriptionLabel = new Label("Description:")
     val descriptionInput = new TextField()
-    descriptionInput.setText(Events.getEventDescription(key))
+    descriptionInput.setText(EventHandler.getEventDescription(key))
 
 
     val categoryLabel = new Label("Category: COMING SOONG :D")
     val categoryInput = new TextField()
-    categoryInput.setText(Events.getCategorie(key))
+    categoryInput.setText(EventHandler.getCategorie(key))
 
 
     // Create input fields for alarm date and time
@@ -271,7 +271,7 @@ object Dialogs {
 
     val colorpicker = new ColorPicker()
 
-    println("Event description:" + Events.getEventDescription(key))
+    println("Event description:" + EventHandler.getEventDescription(key))
 
     grid.add(nameLabel, 1, 1)
     grid.add(nameInput, 2, 1)
@@ -317,12 +317,12 @@ object Dialogs {
       val newAlarm: Option[String] = if alarmdateInput.getEditor.getText.nonEmpty && alarmtimeInput.getText.nonEmpty then
         Some(alarmdateInput.getValue.toString.replace("-", "") + alarmtimeInput.getText.replace(":", "")) else None
 
-      Events.editEventBetter(key, "startTime", newStartDate)
-      Events.editEventBetter(key, "endTime", newEndDate)
-      Events.editEventBetter(key, "description", newDescription)
-      Events.editEventBetter(key, "summary", newName)
-      Events.editEventBetter(key, "categories", newCategory)
-      Events.editEventBetter(key, "trigger", newAlarm)
+      EventHandler.editEventBetter(key, "startTime", newStartDate)
+      EventHandler.editEventBetter(key, "endTime", newEndDate)
+      EventHandler.editEventBetter(key, "description", newDescription)
+      EventHandler.editEventBetter(key, "summary", newName)
+      EventHandler.editEventBetter(key, "categories", newCategory)
+      EventHandler.editEventBetter(key, "trigger", newAlarm)
       dialog.close()
 
 
@@ -334,7 +334,7 @@ object Dialogs {
     dialog.setTitle("Delete event")
     dialog.setHeaderText("Click on Events you wish to delete and then press Delete Button")
 
-    val listView = new ListView(Events.showAllEvents.toList.map((i)=>Events.readFileBetter(i).startTime +"   " + Events.getEventName(i)))
+    val listView = new ListView(EventHandler.showAllEvents.toList.map((i)=>EventHandler.readFile(i).startTime +"   " + EventHandler.getEventName(i)))
     listView.prefHeight = 200
     listView.prefWidth = 200
 
@@ -348,7 +348,7 @@ object Dialogs {
     deleteButton.onAction = (e: ActionEvent) =>
       val selected = listView.selectionModel.apply().getSelectedItem
       if selected != null then
-        Events.deleteEvent(selected.slice(0,14))
+        EventHandler.deleteEvent(selected.slice(0,14))
         View.deleteEventsFromGrid
       //Events.showEvents.foreach((i)=>Weekly_view.setEventtoGrid(i,Events.getEventEndTime(i), Weekly_view.gridpane, true))
       listView.items = listView.items.apply().diff(Seq(selected))
@@ -364,8 +364,8 @@ object Dialogs {
     val button = new Button("filter")
     //
     // List of all categories
-    val allCategories = Events.allCategories
-    val eventsGroupedByCategories = Events.groupedByCategories
+    val allCategories = EventHandler.allCategories
+    val eventsGroupedByCategories = EventHandler.groupedByCategories
 
     // Create checkboxes for all categories
     val checkboxes = allCategories.map((i) =>

@@ -24,7 +24,7 @@ object View {
     val firstDayOfTheWeek = Weekly_view.dateTracker.minusDays(weekDay)
     //add labels for each day of the week
     for i <- days.indices do
-      val check = publIcHolidays.findHoliday(Events.getDateOnly(firstDayOfTheWeek.plusDays(i + 1)))
+      val check = publIcHolidays.findHoliday(dateTimeHandler.getDateOnly(firstDayOfTheWeek.plusDays(i + 1)))
       val label = new Label()
       if check.nonEmpty then
         label.setText(days(i) + "   " + check)
@@ -43,7 +43,7 @@ object View {
 
    allEventChildren = allEventChildren.empty
 
-   Events.showEvents.foreach((i)=>Weekly_view.setEventToGridWeekly(i,Events.getEventEndTime(i)))
-   Events.showEvents.foreach((i)=>dailyViewTab.SetEventToGridDaily(i,Events.getEventEndTime(i)))
+   EventHandler.showEvents.foreach((i)=>Weekly_view.setEventToGridWeekly(i,EventHandler.getEventEndTime(i)))
+   EventHandler.showEvents.foreach((i)=>dailyViewTab.SetEventToGridDaily(i,EventHandler.getEventEndTime(i)))
    putWeekdaysAndHolidays
 }

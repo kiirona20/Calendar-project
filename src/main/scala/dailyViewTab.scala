@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
 
 object dailyViewTab{
   var dragInputCheck = false
-  var currentDay = Events.getDateToday
+  var currentDay = dateTimeHandler.getDateToday
   val rowsHeightPercentage = 100 / 25
   //width set 1 day + 2 buttons
   //day takes 80% of the screen
@@ -69,20 +69,20 @@ object dailyViewTab{
 
 
   //FindHoliday in case the publicholiday is on the same day you open the calendar
-  val day = new Label(currentDay.getDayOfWeek.toString + "  " + publIcHolidays.findHoliday(Events.getDateOnly(currentDay)) + "  " + currentDay)
+  val day = new Label(currentDay.getDayOfWeek.toString + "  " + publIcHolidays.findHoliday(dateTimeHandler.getDateOnly(currentDay)) + "  " + currentDay)
   gridPane.add(day,1,0)
   gridPane.add(button2,2,0)
 
 
   button1.onAction = (e: ActionEvent) =>
     currentDay = currentDay.minusDays(1)
-    val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
+    val holidays = publIcHolidays.findHoliday(dateTimeHandler.getDateOnly(currentDay))
     day.text = currentDay.getDayOfWeek.toString + "  " + holidays + "  " + currentDay
     View.deleteEventsFromGrid
 
   button2.onAction = (e: ActionEvent) =>
     currentDay = currentDay.plusDays(1)
-    val holidays = publIcHolidays.findHoliday(Events.getDateOnly(currentDay))
+    val holidays = publIcHolidays.findHoliday(dateTimeHandler.getDateOnly(currentDay))
     day.text = currentDay.getDayOfWeek.toString + "  " + holidays+ "  " + currentDay
     View.deleteEventsFromGrid
 
@@ -116,7 +116,7 @@ object dailyViewTab{
       startTime = LocalTime.of(startTimeHour.toInt, startTimeMinute.toInt, 0).format(timeFormat)
       endTime = LocalTime.of(endTimeHour, endTimeMinute.toInt, 0).format(timeFormat)
       Dialogs.EventInputDialog
-  Events.showEvents.foreach((i)=>SetEventToGridDaily(i,Events.getEventEndTime(i)))
+  EventHandler.showEvents.foreach((i)=>SetEventToGridDaily(i,EventHandler.getEventEndTime(i)))
 
 
 
@@ -125,8 +125,8 @@ object dailyViewTab{
     //println("Grid daily dateStart:" + Events.convertStringToDateTIme(dateStart))
     //println("Grid daily dateEnd:" + Events.convertStringToDateTIme(dateEnd))
     //Converts dateStart and dateEnd to localDateTime for making it easier to compare these dates
-    var convertedDateStart = Events.convertStringToDate(dateStart)
-    val convertedDateEnd = Events.convertStringToDate(dateEnd)
+    var convertedDateStart = dateTimeHandler.convertStringToDate(dateStart)
+    val convertedDateEnd = dateTimeHandler.convertStringToDate(dateEnd)
     //Loops through the days
     var currentDayLoop = convertedDateStart
 
@@ -136,10 +136,10 @@ object dailyViewTab{
 
         var startTime = LocalTime.MIDNIGHT
         if currentDay.isEqual(convertedDateStart) then
-          startTime = Events.convertStringToTime(dateStart)
+          startTime = dateTimeHandler.convertStringToTime(dateStart)
         var endtime = LocalTime.MAX
         if currentDay.isEqual(convertedDateEnd) then
-          endtime = Events.convertStringToTime(dateEnd)
+          endtime = dateTimeHandler.convertStringToTime(dateEnd)
 
         val hourStart = startTime.getHour
         val minuteStart = startTime.getMinute.toDouble
@@ -163,10 +163,10 @@ object dailyViewTab{
 
         rectangle.width = sceneWidth/1.25-10
         rectangle.height = eventHeight
-        rectangle.fill = Events.getEventColor(dateStart)
+        rectangle.fill = EventHandler.getEventColor(dateStart)
         stack.setAlignment(Pos.TopLeft)
         stack.setTranslateY(eventOffset)
-        val label = new Label(Events.getEventName(dateStart))
+        val label = new Label(EventHandler.getEventName(dateStart))
         stack.getChildren.addAll(rectangle, label)
 
         View.allEventChildren = View.allEventChildren.appended(stack)

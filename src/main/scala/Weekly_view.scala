@@ -39,7 +39,7 @@ object Weekly_view extends JFXApp3:
  val amountOfColumnds = 25
      // Define the days of the week
     // Variables for tracking the current date and events
- var dateTracker = Events.getDateToday
+ var dateTracker = dateTimeHandler.getDateToday
  val gridpane = new GridPane
 
 
@@ -47,8 +47,8 @@ object Weekly_view extends JFXApp3:
   def setEventToGridWeekly(dateStart: String, dateEnd: String) =
           // Convert date strings to date format
 
-   val convertedDateStart = Events.convertStringToDate(dateStart)
-   val convertedDateEnd = Events.convertStringToDate(dateEnd)
+   val convertedDateStart = dateTimeHandler.convertStringToDate(dateStart)
+   val convertedDateEnd = dateTimeHandler.convertStringToDate(dateEnd)
           // Get the weekday of the current date
    val weekDay = dateTracker.getDayOfWeek.getValue
           // Get the start date of the current week
@@ -68,14 +68,14 @@ object Weekly_view extends JFXApp3:
        // Checks if the currentDate is same as starting date
        // If not then startTime starts at 00:00. This is in case of events that lasts longer than 1 day
        if currentDate.isEqual(convertedDateStart) then
-         startTime = Events.convertStringToTime(dateStart)
+         startTime = dateTimeHandler.convertStringToTime(dateStart)
 
        var endTime: LocalTime = LocalTime.MAX
 
        // Chekcs if the currentDate is same as end Date
        // If not then endTime is 23:59. This is in case of events that lasts longer than 1 day
        if currentDate.isEqual(convertedDateEnd) then
-         endTime = Events.convertStringToTime(dateEnd)
+         endTime = dateTimeHandler.convertStringToTime(dateEnd)
        // Calculate start and end time ratios
        val hourStart = startTime.getHour
        val minStart = startTime.getMinute.toDouble
@@ -108,18 +108,18 @@ object Weekly_view extends JFXApp3:
        rectangle.width = sceneWidth/amountOfRows-10
 
        rectangle.height = eventHeight
-       rectangle.fill = Events.getEventColor(dateStart)
+       rectangle.fill = EventHandler.getEventColor(dateStart)
               // Align the stack and shift it down
        stack.setAlignment(Pos.TopLeft)
        stack.setTranslateY(eventOffset)
               // Create a tooltip for the event
        val tooltip = new Tooltip()
-       tooltip.setText("Event name: " + Events.getEventName(dateStart) + "\n" +
-       "Event start time: " + Events.convertStringToDateTIme(dateStart) + "\n" +
-       "Event end time: " + Events.convertStringToDateTIme(dateEnd) + "\n" +
-       "Event description: " + Events.getEventDescription(dateStart))
+       tooltip.setText("Event name: " + EventHandler.getEventName(dateStart) + "\n" +
+       "Event start time: " + dateTimeHandler.convertStringToDateTIme(dateStart) + "\n" +
+       "Event end time: " + dateTimeHandler.convertStringToDateTIme(dateEnd) + "\n" +
+       "Event description: " + EventHandler.getEventDescription(dateStart))
               // Add the event name to the stack
-       val label = new Label(Events.getEventName(dateStart))
+       val label = new Label(EventHandler.getEventName(dateStart))
        Tooltip.install(stack,tooltip)
               // Add the rectangle and label to the stack
        stack.getChildren.addAll(rectangle, label)
@@ -245,7 +245,7 @@ object Weekly_view extends JFXApp3:
           if me.button == MouseButton.Secondary then
             contextmenu.show(this.window(),me.screenX,me.screenY)
         //set Events to grid
-        Events.showEvents.foreach((i)=>setEventToGridWeekly(i,Events.getEventEndTime(i)))
+        EventHandler.showEvents.foreach((i)=>setEventToGridWeekly(i,EventHandler.getEventEndTime(i)))
         tabPane.tabs = List(tab1,tab2)
         root = tabPane
 
