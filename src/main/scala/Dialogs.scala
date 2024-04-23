@@ -1,5 +1,5 @@
 import EventHandler.allCategories
-import Weekly_view.{gridpane, setEventToGridWeekly}
+import Weekly_view.{setEventToGridWeekly}
 import javafx.scene.layout.VBox
 import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx}
 import scalafx.beans.property.BooleanProperty
@@ -83,6 +83,9 @@ object Dialogs {
 
     //add stuff to grid
     val grid = new GridPane()
+
+
+
     grid.add(nameLabel, 1, 1)
     grid.add(nameInput, 2, 1)
     grid.add(startDateLabel, 1, 2)
