@@ -20,10 +20,12 @@ import java.time.format.DateTimeFormatter
 import java.time.{Duration, LocalDate, LocalDateTime}
 import java.util.UUID
 
+private case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, color: Color, alarmDate: String, alarmTime: String)
+
+
 object Dialogs {
   //Result class to store are dialog values
-  case class Result(name: String, startDate: String, startTime: String, endDate: String, endTime: String, description: String, category: String, color: Color, alarmDate: String, alarmTime: String)
-  private val generateNewUid: String = (UUID.randomUUID().toString + "-1234567890@example.com ,")
+  private var generateNewUid: String = UUID.randomUUID().toString
   // Function to display a dialog for adding a new even
   def EventInputDialog: Unit =
     // Create a new dialog for adding events
@@ -168,11 +170,12 @@ object Dialogs {
     val summary1 = if summary.isEmpty then None else Some(summary)
     val description1 = if description.isEmpty then None else Some(description)
     val alarmDateTIme: Option[String] = if alarDate.nonEmpty && alarTime.nonEmpty then Some(alarDate + alarTime) else None
-    val event = Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme)
-    EventHandler.addEvent(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme))
-    View.deleteEventsFromGrid
-    println(event.color)
-    println(event.description)
+    generateNewUid = UUID.randomUUID().toString
+    if dateTimeHandler.convertStringToDateTIme(stDateTime).isBefore(dateTimeHandler.convertStringToDateTIme(endDateTime)) then
+      EventHandler.addEvent(Event(generateNewUid, stDateTime, endDateTime, summary1, description1, category1, Some(color), alarmDateTIme))
+      View.deleteEventsFromGrid
+    else
+      new Alert(AlertType.Error, "Event end time was before start time.\nEvent was not registered").showAndWait()
 
   def editEventDialog: Unit =
     val dialog = new Dialog[Unit]()
@@ -213,7 +216,7 @@ object Dialogs {
         processEditDialog(selected.toString)
     dialog.showAndWait()
 
-  def processEditDialog(key: String) =
+  def processEditDialog(key: String): Unit =
 
     val dialog = new Dialog[Unit]()
     val grid = new GridPane()
@@ -296,7 +299,6 @@ object Dialogs {
     grid.add(categoryInput, 2, 7)
 
 
-
     grid.add(alarmdateLabel, 1, 8)
     grid.add(alarmdateInput, 2, 8)
 
@@ -319,13 +321,16 @@ object Dialogs {
       val newCategory: Option[String] = if categoryInput.text != null then Some(categoryInput.getText) else None
       val newAlarm: Option[String] = if alarmdateInput.getEditor.getText.nonEmpty && alarmtimeInput.getText.nonEmpty then
         Some(alarmdateInput.getValue.toString.replace("-", "") + alarmtimeInput.getText.replace(":", "")) else None
+      if dateTimeHandler.convertStringToDateTIme(newStartDate.get).isBefore(dateTimeHandler.convertStringToDateTIme(newEndDate.get)) then
+        EventHandler.editEvent(key, "startTime", newStartDate)
+        EventHandler.editEvent(key, "endTime", newEndDate)
+        EventHandler.editEvent(key, "description", newDescription)
+        EventHandler.editEvent(key, "summary", newName)
+        EventHandler.editEvent(key, "categories", newCategory)
+        EventHandler.editEvent(key, "trigger", newAlarm)
+      else
+        new Alert(AlertType.Error, "Event end time was before start time.\nEvent was not edited").showAndWait()
 
-      EventHandler.editEventBetter(key, "startTime", newStartDate)
-      EventHandler.editEventBetter(key, "endTime", newEndDate)
-      EventHandler.editEventBetter(key, "description", newDescription)
-      EventHandler.editEventBetter(key, "summary", newName)
-      EventHandler.editEventBetter(key, "categories", newCategory)
-      EventHandler.editEventBetter(key, "trigger", newAlarm)
       dialog.close()
 
 
@@ -388,14 +393,14 @@ object Dialogs {
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.Cancel, ButtonType.Finish)
     dialog.showAndWait()
 
-  def handleCheckBox(boxes: Seq[CheckBox], filterList: Boolean) =
+  def handleCheckBox(boxes: Seq[CheckBox], filterList: Boolean): Unit =
     var selectedList: Seq[String] = Seq[String]()
     for i <- boxes.indices do
       if boxes(i).isSelected then
         selectedList = selectedList :+ boxes(i).getText
     if filterList then
       calendarState.appliedFiltersDialog(selectedList)
-      
+
     else
       calendarState.appliedFilters(selectedList)
 

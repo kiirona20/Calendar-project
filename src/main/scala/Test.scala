@@ -1,15 +1,13 @@
 
-import dateTimeHandler.{getDateOnly, getDateToday, getdayOfWeek}
+import dateTimeHandler.{getDateOnly, getdayOfWeek}
 import Weekly_view.dateTracker
-import akka.actor.{ActorSystem, Props}
 import scalafx.scene.paint.Color
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime}
 import scala.io.StdIn.*
 
-object Main extends App {
-    //Should work with this input = name,202003031700,202003031800, hopefully this works :D
-
+object Test extends App {
+  //BackendTesting
 
   val testEvent = "20230512160000,20230513190000, hopefully this works :(, kiva, CONFERENCE,20230512110000"
   val testEvent2 = "20230513180000,20230513190000, hopefully this works :(, mörkö, CONFERENCE,20230512120000"
@@ -36,7 +34,7 @@ object Main extends App {
 
 @main
   def testEditBetter =
-    EventHandler.editEventBetter("20240323160000","description",Some("lol"))
+    EventHandler.editEvent("20240323160000","description",Some("lol"))
 
 @main
   def showEvents =
@@ -96,7 +94,7 @@ object Main extends App {
 @main
   def testGettingDayRight =
     println(getdayOfWeek("20240101160000"))
-    println(getDateToday.getDayOfWeek)
+    println(LocalDate.now())
 @main
   def checkHolidays =
     val today = dateTracker

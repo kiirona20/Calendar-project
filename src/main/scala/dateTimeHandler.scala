@@ -25,11 +25,11 @@ object dateTimeHandler {
   def convertStringToDateTIme(date: String): LocalDateTime =
     LocalDateTime.parse(date, dateFormat)
 
-  def getDateToday = LocalDate.now()
+
+  def getDateOnly(date:LocalDate): String = date.format(dayMonthFormat)
   
-  def getDateOnly(date:LocalDate) = date.format(dayMonthFormat)
-  
-  def convertLocalDateTimeToFormat(date: LocalDateTime) = date.format(dateFormat)
+  def convertLocalDateTimeToFormat(date: LocalDateTime): String = date.format(dateFormat)
+
  
 
 }

@@ -32,10 +32,9 @@ class Event(var uid: String = "", var startTime: String = "",
         else
           defineAlarm
       case _ => println("Element not found or cannot be changed")
-  def changeColor(color1: Option[Color]) =
+  def changeColor(color1: Option[Color]): Unit =
     color = color1
-    println(color)
-  
+
   
   //Checks if the alarm is defined
   def defineAlarm: Unit =
@@ -48,10 +47,6 @@ class Event(var uid: String = "", var startTime: String = "",
       //Check that there are no alarms that has passed already and if the alarm hasn't been defined yet
       if scalaDuration.>=(FiniteDuration.apply(1, TimeUnit.SECONDS)) then
         alarm = Alarm(scalaDuration, summary.getOrElse("No name for the task"))
-      //If alarm has been defined cancel the scheduler and make a new alarm
-      //else if scalaDuration.>=(FiniteDuration.apply(1, TimeUnit.SECONDS)) then
-        //alarm.alarmEvent.cancel()
-        //((alarm = Alarm(scalaDuration, summary.getOrElse("No name for the task"))
       else
         println("Some error in defining the alarm")
 }

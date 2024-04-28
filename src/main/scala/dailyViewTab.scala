@@ -13,12 +13,12 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
 import scala.math.{max, min}
-import java.time.LocalTime
+import java.time.{LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
 
 object dailyViewTab{
   var dragInputCheck = false
-  var currentDay = dateTimeHandler.getDateToday
+  var currentDay = LocalDate.now()
   val rowsHeightPercentage = 100 / 25
   //width set 1 day + 2 buttons
   //day takes 80% of the screen
@@ -28,7 +28,7 @@ object dailyViewTab{
   var clock = 0.00
   private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-
+//sets up the view
   val gridPane = new GridPane
   for i <- 0 until (25) do
     val row = new RowConstraints()
@@ -102,7 +102,7 @@ object dailyViewTab{
 
   var startTime:String = ""
   var endTime:String = ""
-  def dragCalculateTime =
+  def dragCalculateTime: Unit =
     val oneRowHeight = sceneHeight/24
     //-1 beacause there are 25 collumns
     val startTimeHour = ((min(startMousePressed,endMouseReleased)/oneRowHeight).floor-1).toInt

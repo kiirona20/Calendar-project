@@ -1,7 +1,7 @@
-import Weekly_view.{ dateTracker, sceneHeight, sceneWidth}
+import Weekly_view.{dateTracker, sceneHeight, sceneWidth}
 import scalafx.geometry.Pos
 import scalafx.scene.Node
-import scalafx.scene.control.{Label, Tooltip}
+import scalafx.scene.control.Label
 import scalafx.scene.layout.{GridPane, StackPane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
@@ -39,11 +39,10 @@ object View {
 
    allEventChildren.foreach((i)=> Weekly_view.gridpane.children -= i)
    allEventChildren.foreach((i)=> dailyViewTab.gridPane.children -= i)
-
-
    allEventChildren = allEventChildren.empty
-
    EventHandler.showEvents.foreach((i)=>Weekly_view.setEventToGridWeekly(i,EventHandler.getEventEndTime(i)))
    EventHandler.showEvents.foreach((i)=>dailyViewTab.SetEventToGridDaily(i,EventHandler.getEventEndTime(i)))
    putWeekdaysAndHolidays
+
+
 }

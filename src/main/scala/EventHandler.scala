@@ -7,15 +7,13 @@ import java.util.UUID
 import scala.{:+, ::}
 import scala.collection.mutable
 import scala.collection.mutable.LinkedHashMap
-import scala.compiletime.ops.int
-import sys.process.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object EventHandler {
   // Writes user inputs to a txt file in a correct format.
   def writetoFile(linesToWrite: mutable.LinkedHashMap[String, Seq[String]]):  Unit =
-    val fileIn = FileWriter("icalendarformat.txt")
+    val fileIn = FileWriter("eventInfo.ics")
     var lineWriter = BufferedWriter(fileIn)
 
     try
@@ -62,7 +60,7 @@ object EventHandler {
 
     var storedEvents: Map[String,Event] = Map()
     //tries to find and open iCalendarformat.txt
-    val lineReader = try BufferedReader(FileReader("iCalendarformat.txt"))
+    val lineReader = try BufferedReader(FileReader("eventInfo.ics"))
 
       catch
         case e: FileNotFoundException => return storedEvents
@@ -142,14 +140,17 @@ object EventHandler {
   def addEvent(userInput: Event): Unit =
     val existingEvents = readFile
     val updatedEvents = existingEvents.values.toSeq :+ userInput
+
     val formattedEvents = iCalendarformat(updatedEvents)
     writetoFile(formattedEvents)
 
 
-  def showEventDetails(userInput: String) = readFile(userInput)
+  def showEventDetails(userInput: String): Event = readFile(userInput)
+
+
 
   //Edits and writes the edited event to the txt file
-  def editEventBetter(key: String, edit: String, toWhat: Option[String]): Unit =
+  def editEvent(key: String, edit: String, toWhat: Option[String]): Unit =
     val listOfEvents = readFile
     if !listOfEvents.contains(key) then
       println("Event not found!")
@@ -180,25 +181,28 @@ object EventHandler {
     readFile(key).trigger.getOrElse("")
 
 
-
-  def groupedByCategories =
-    readFile.groupBy((i)=>i._2.categories).filter((i)=>i._1.isDefined)
+  def groupedByCategories: Map[Option[String], Map[String, Event]] =
+    readFile.groupBy((i) => i._2.categories).filter((i) => i._1.isDefined)
   //Filters all the None categories
-  def allCategories =
+
+
+  def allCategories: Iterable[Option[String]] =
     groupedByCategories.keys
 
-  def showAllEvents = readFile.keys
+  def showAllEvents: Iterable[String] = readFile.keys
 
   def getEventColor(key: String): Color =
     readFile(key).color.getOrElse(Color.Aqua)
+
   //Checks the calendarState in case of filters
   //Used in daily and weeklyView to filter the view
-  def showEvents =
+  def showEvents: Iterable[String] =
     if calendarState.appliedFilter.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter.contains(i._1.get)).values.flatMap((i) => i.keys)
     else
       showAllEvents
+
   //Same but for editEventDialog class
-  def showEventsEditDialog =
+  def showEventsEditDialog: Iterable[String] =
     if calendarState.appliedFilter2.nonEmpty then groupedByCategories.filter((i) => calendarState.appliedFilter2.contains(i._1.get)).values.flatMap((i) => i.keys)
     else
       showAllEvents

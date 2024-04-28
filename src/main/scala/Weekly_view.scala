@@ -1,33 +1,27 @@
 
-import javafx.collections.FXCollections
-import scalafx.stage.*
+import javafx.util.converter.LocalTimeStringConverter
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
-import scalafx.scene.Scene
 import scalafx.beans.binding.Bindings
-import scalafx.scene.Node
-import scalafx.scene.layout.*
-import scalafx.scene.control.*
-import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.event.ActionEvent
+import scalafx.geometry.Pos
+import scalafx.scene.control.*
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.input.*
+import scalafx.scene.layout.*
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
-
-import sys.process.*
-import java.time.{LocalDate, LocalDateTime, LocalTime}
-import javafx.util.converter.LocalTimeStringConverter
-import scalafx.geometry.Pos
+import scalafx.scene.{Node, Scene}
+import scalafx.stage.*
 
 import java.time.format.DateTimeFormatter
+import java.time.{Duration, LocalDate, LocalDateTime, LocalTime}
 import java.util.OptionalInt
 import scala.annotation.internal.Child
-import akka.actor.*
-import scalafx.scene.control.Alert.AlertType
-
-import scala.concurrent.duration.*
-import java.time.{Duration, LocalDateTime}
 import scala.concurrent.Future
+import scala.concurrent.duration.*
+import scala.sys.process.*
 
 object Weekly_view extends JFXApp3:
 
@@ -38,7 +32,7 @@ object Weekly_view extends JFXApp3:
  val amountOfColumnds = 25
 
  // Variable for tracking the current date
- var dateTracker = dateTimeHandler.getDateToday
+ var dateTracker = LocalDate.now()
 
 
  val gridpane = new GridPane
@@ -83,8 +77,9 @@ object Weekly_view extends JFXApp3:
        // Calculate total height of the event based on screen height
        val eventHeight = (endTimeRatio - startTimeRatio) * sceneHeight
        // Calculate the Y offset to position the event correctly in the grid
-       val eventOffset = (minStart / 60) * (sceneHeight / amountOfColumnds)
+       val eventOffset = (minStart / 60) * (sceneHeight / 24)
        // Calculate row span for the event
+
        var rowSpanMinute = 0
        if minuteEnd>minStart then
          rowSpanMinute = 1
